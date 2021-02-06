@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/peter/orientationDetermination/include/matrix.h
+vector
+-
+
+/home/peter/orientationDetermination/include/oriDetermine.cpp
+iostream
+-
+vector
+-
+utility
+-
+cmath
+-
+oriDetermine.h
+/home/peter/orientationDetermination/include/oriDetermine.h
+matrix.h
+/home/peter/orientationDetermination/include/matrix.h
+
+/home/peter/orientationDetermination/include/oriDetermine.h
+vector
+-
+utility
+-
+matrix.h
+/home/peter/orientationDetermination/include/matrix.h
+

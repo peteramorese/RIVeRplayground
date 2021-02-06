@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/peter/orientationDetermination/include/matrix.cpp
+iostream
+-
+vector
+-
+matrix.h
+/home/peter/orientationDetermination/include/matrix.h
+
+/home/peter/orientationDetermination/include/matrix.h
+vector
+-
+
