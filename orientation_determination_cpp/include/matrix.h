@@ -10,6 +10,7 @@ class matrix {
 		const unsigned int rows, cols;
 		void set(std::vector<std::vector<T>>& set_vec);
 		void fill(T elem);
+		void eye();
 		void scale(T scalar);
 		void add(T scalar);
 		void print() const;

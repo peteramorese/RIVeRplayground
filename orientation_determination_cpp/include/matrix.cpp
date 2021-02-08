@@ -26,6 +26,27 @@ void matrix<T>::fill(T elem){
 }
 
 template <class T>
+void matrix<T>::eye(){
+	if (rows==cols) {
+		T uno = 1.0;
+		T zero = 0.0;
+		for (int i=0; i<rows; i++){
+			for (int j=0; j<cols; j++){
+				if (j==i){
+					mat[i][j] = uno;
+				} else {
+					mat[i][j] = zero;
+				}
+			}
+		} 
+
+	} else {
+		std::cout<<"Error: Matrix is not square, cannot make identity\n";
+	}
+}
+
+
+template <class T>
 void matrix<T>::scale(T scalar){
 	for (int i=0; i<mat.size(); i++){
 		for (int j=0; j<mat[i].size(); j++){
@@ -138,7 +159,7 @@ matrix<T> matrix<T>::operator- (const matrix<T>& arg) const{
 }
 
 
-template class matrix<int>;
-template class matrix<float>;
 template class matrix<double>;
+template class matrix<int>;
+//template class matrix<float>;
 

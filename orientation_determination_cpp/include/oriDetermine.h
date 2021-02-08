@@ -5,15 +5,15 @@
 
 class oriDetermine {
 	private:
-		float norm3(float* arr_ptr);
-		void cross3(float* A, float* B, float* product_ptr);
-		matrix<float> q2R(float* v, float theta);
+		double norm3(double* arr_ptr);
+		void cross3(double* A, double* B, double* product_ptr);
+		matrix<double> q2R(double* v, double theta);
 	public:
-		oriDetermine(std::vector<std::pair<float[3], int>>& bag_);
-		void setData(std::vector<std::pair<float[3], int>>& coords_3Ddata_);
+		oriDetermine(std::vector<std::pair<double[3], int>>& bag_);
+		void setData(std::vector<std::pair<double[3], int>>& coords_3Ddata_);
 		void setIterations(int Niter_);
-		void setAlpha(float alpha_);
-		matrix<float> returnQ();
+		void setAlpha(double alpha_);
+		matrix<double> returnQ();
 
 
 };

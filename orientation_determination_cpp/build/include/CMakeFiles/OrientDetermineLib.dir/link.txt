@@ -1,2 +1,0 @@
-/usr/bin/ar qc libOrientDetermineLib.a  CMakeFiles/OrientDetermineLib.dir/oriDetermine.cpp.o
-/usr/bin/ranlib libOrientDetermineLib.a

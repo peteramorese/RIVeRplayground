@@ -1,7 +1,0 @@
-/home/peter/orientationDetermination/build/CMakeFiles/rebuild_cache.dir
-/home/peter/orientationDetermination/build/CMakeFiles/orientationDetermination.dir
-/home/peter/orientationDetermination/build/CMakeFiles/edit_cache.dir
-/home/peter/orientationDetermination/build/include/CMakeFiles/rebuild_cache.dir
-/home/peter/orientationDetermination/build/include/CMakeFiles/edit_cache.dir
-/home/peter/orientationDetermination/build/include/CMakeFiles/oriDetermineClass.dir
-/home/peter/orientationDetermination/build/include/CMakeFiles/matrixClass.dir

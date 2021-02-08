@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmatrixClass.a  CMakeFiles/matrixClass.dir/matrix.cpp.o
-/usr/bin/ranlib libmatrixClass.a
