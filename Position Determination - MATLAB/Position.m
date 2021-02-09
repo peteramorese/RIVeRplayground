@@ -26,7 +26,7 @@ clear t_start t_stop;
 
 % Calibration Times
 t_start = 0; % [s] Initial Time
-t_stop = 500; % [s] End Time
+t_stop = 120; % [s] End Time
 t = t_start:dT:t_stop; % [s] Time vector
 
 MID_mat = [1; 2; 3]; % Matrix containing the Marker IDs corresponding to the Sensor IDs to measure them
@@ -37,19 +37,27 @@ Calibrate.markers.M1 = [0; 0.1; 0.1]; % Redefine the known position of M1
 Calibrate.markers.M2 = [0.05; -0.05; 0.1]; % Redefine the known position of M2
 Calibrate.markers.M3 = [0.1; -0.05; 0]; % Redefine the known position of M3
 
+% filename = 'Y_sim.txt';
+
 for sid = 1:3
     
+    sid_str = sprintf('S%d', sid);
+    
     fprintf('Calibrating Sensor %d...\n', sid);
+    fprintf('\tPosition = [%.5f, %.5f, %.5f]\n', SENSORS_true.(sid_str).pos);
 
     Y_cal = get_sim_data(sid, MID_mat, t, R, CORE, Calibrate, SENSORS_true);
+    
+    filename = sprintf('Y_sim%d.txt', sid);
+    
+    write_sim_data(filename, Y_cal);
 
-    sid_str = sprintf('S%d', sid);
     x0 = SENSORS_true.(sid_str).pos + mvnrnd([0; 0; 0], 0.01*eye(3))';
 
     [ekf_cal, SENSORS_calib] = run_ekf_calib(t, Y_cal, x0, R, Calibrate, sid, CORE, SENSORS_calib, CONSTANTS);
 
-    % meas_innov = get_meas_innov(t, ekf_cal);
-    % innov_fig = figure; plot_meas_innov(t, meas_innov, 1, innov_fig);
+    meas_innov = get_meas_innov(t, ekf_cal);
+    innov_fig = figure; plot_meas_innov(t, meas_innov, 1, innov_fig);
     
     plot_estimate(t, ekf_cal, sprintf('Sensor S%d', sid), 0, 'calibration.png')
 

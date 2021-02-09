@@ -33,7 +33,7 @@ SENSORS_true.S1.Q_C = CORE.frame*SENSORS_true.S1.frame; % Direction Cosine Matri
 clear s1_C
 
 %% Sensor 2 Frame (defined in the Core Frame)
-s2_C = [0.56; 0.52; -0.6] + [-0.0370; 0.0325; 0.1514]; % Position of Sensor 2 (defined in the C Frame)
+s2_C = [0.56; 0.52; -0.6] + 0.1*randn(3, 1); % Position of Sensor 2 (defined in the C Frame)
 
 SENSORS_true.S2.pos = s2_C; % Position of Sensor 2 (defined in the C Frame)
 SENSORS_true.S2.point = CORE.origin; % Reference point centered in the sensor's FOV
@@ -43,7 +43,7 @@ SENSORS_true.S2.Q_C = CORE.frame*SENSORS_true.S2.frame; % Direction Cosine Matri
 clear s2_C
 
 %% Sensor 3 Frame (defined in the Core Frame)
-s3_C = [0.56; 0.52; 0.6] + [-0.0235; 0.1107; -0.1603]; % Position of Sensor 3 (defined in the C Frame)
+s3_C = [0.56; 0.52; 0.6]; % Position of Sensor 3 (defined in the C Frame)
 
 SENSORS_true.S3.pos = s3_C; % Position of Sensor 3 (defined in the C Frame)
 SENSORS_true.S3.point = CORE.origin; % Reference point centered in the sensor's FOV
