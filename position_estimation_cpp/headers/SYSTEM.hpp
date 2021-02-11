@@ -22,8 +22,8 @@ namespace plt = matplotlibcpp;
 class SYSTEM
 {
 public:
-	int sim = 1; // Flag defining simulation run mode
-	
+	bool sim = true; // Flag defining simulation run mode
+
 	SYSTEM();
 	~SYSTEM();
 	void calibrate(BAG);
@@ -37,6 +37,7 @@ private:
 
 	void init_default_sensors();
 	vector<vector<DATA>> read_data(string);
+	void run_estimator(vector<vector<vector<DATA>>>);
 
 
 };

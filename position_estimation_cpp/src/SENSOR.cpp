@@ -15,6 +15,7 @@ namespace plt = matplotlibcpp;
 SENSOR::SENSOR()
 {
 	position = zeros<vec>(3);
+	position_true = zeros<vec>(3);
 	point = zeros<vec>(3);
 	frame = zeros<mat>(3, 3);
 	Q_C = zeros<mat>(3, 3);
@@ -25,6 +26,7 @@ SENSOR::SENSOR()
 SENSOR::SENSOR(vec pos, vec pnt)
 {
 	position = pos;
+	position_true = zeros<vec>(3);
 	point = pnt;
 	CORE c;
 	frame = get_sensor_frame(pos, pnt, c);

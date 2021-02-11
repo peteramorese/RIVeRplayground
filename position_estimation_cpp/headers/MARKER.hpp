@@ -2,6 +2,9 @@
 #define MARKER_H
 
 #include "EKF.hpp"
+#include "DATA.hpp"
+#include "CORE.hpp"
+#include "CONSTANTS.hpp"
 
 #include <armadillo>
 using namespace arma;
@@ -21,6 +24,9 @@ public:
 
 private:
 	std::vector<EKF> ekf;
+
+	void init_ekf();
+	void estimate_pos(vector<vector<vector<DATA>>>, CORE, CONSTANTS);
 
 	
 };

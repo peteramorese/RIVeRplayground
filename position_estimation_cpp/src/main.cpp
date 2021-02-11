@@ -1,23 +1,6 @@
 #include "SYSTEM.hpp"
-#include "CONSTANTS.hpp"
-#include "CORE.hpp"
-#include "DATA.hpp"
-#include "MARKER.hpp"
-#include "BAG.hpp"
-#include "SENSOR.hpp"
-#include "EKF.hpp"
-// #include "addtl_func.hpp"
-
 #include "matplotlibcpp.h"
-
-#include <iostream>
-#include <string>
-#include <armadillo>
-
 using namespace std;
-using namespace arma;
-namespace plt = matplotlibcpp;
-
 
 int main()
 {

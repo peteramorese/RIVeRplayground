@@ -52,7 +52,6 @@ void SYSTEM::calibrate(BAG cal)
 		sensors[i].calibrate_sensor(Y[i], cal, core, cnst);
 		cout << "DONE" << endl;
 	}
-
 }
 
 
@@ -70,11 +69,7 @@ std::vector<std::vector<DATA>> SYSTEM::read_data(string filename)
 	DATA y_k;
 
 	while(std::getline(file, str))
-	// for(int i = 0; i < 5; i++)
 	{
-
-		// getline(file, str);
-
 		stringstream part(str);
 
 		cnt = 0;
@@ -88,22 +83,18 @@ std::vector<std::vector<DATA>> SYSTEM::read_data(string filename)
 			if(cnt == 1)
 			{
 				y_k.x = stod(substr);
-				// cout << "x = " << y_k.x << endl;
 			}
 			else if(cnt == 2)
 			{
 				y_k.y = stod(substr);
-				// cout << "y = " << y_k.y << endl;
 			}
 			else if(cnt == 3)
 			{
 				y_k.mid = stoi(substr) - 1;
-				// cout << "mid = " << y_k.mid << endl;
 			}
 			else if(cnt == 4)
 			{
 				y_k.sid = stoi(substr) - 1;
-				// cout << "sid = " << y_k.sid << endl;
 			}
 		}
 
@@ -116,8 +107,14 @@ std::vector<std::vector<DATA>> SYSTEM::read_data(string filename)
 			Y_k.clear();
 		}
 		i++;
-		// cout << "i = " << i << endl;
 	}
 
 	return Y_sid;
+}
+
+
+void SYSTEM::run_estimator(vector<vector<vector<DATA>>> Y)
+{
+
+
 }
