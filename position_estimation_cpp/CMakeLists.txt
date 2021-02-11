@@ -18,7 +18,7 @@ include_directories(${PYTHON_INCLUDE_DIR})
 
 
 # add the executable
-add_executable(test_run ${SOURCES})
+add_executable(main ${SOURCES})
 
 target_link_libraries(test_run ${ARMADILLO_LIBRARIES})
 target_link_libraries(test_run ${PYTHON_LIBRARY})
