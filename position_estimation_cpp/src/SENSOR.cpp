@@ -61,7 +61,7 @@ void SENSOR::set_constants()
 	sid = 0;
 }
 
-void SENSOR::init_default_sensors(int id, CORE c)
+void SENSOR::init_default_sensor(int id, CORE c)
 {
 	// Function to initalize the default positions and point of the sensor system
 	// Positions and pointing must be defined here for operation
@@ -240,7 +240,7 @@ std::tuple<double, double> SENSOR::get_yhat(MARKER m, CORE c, bool sim = false)
 }
 
 
-void SENSOR::calibrate_sensor(std::vector<double> t, std::vector<std::vector<DATA>> Y, BAG bag, CORE core, CONSTANTS cnst)
+void SENSOR::calibrate_sensor(std::vector<std::vector<DATA>> Y, BAG bag, CORE core, CONSTANTS cnst)
 {
 	// Function to calibrate the sensor's position based on measurements of markers at known positions
 	// Uses an Extended Kalman Filter to estimate
@@ -257,7 +257,7 @@ void SENSOR::calibrate_sensor(std::vector<double> t, std::vector<std::vector<DAT
 	EKF e;
 	std::vector<DATA> y_k;
 
-	for(int k = 0; k < t.size(); k++) // For each time k
+	for(int k = 0; k < Y.size(); k++) // For each time k
 	{
 		y_k = Y[k]; // Measurement of all markers at time k
 
@@ -362,7 +362,7 @@ EKF SENSOR::ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE core, CONSTAN
 }
 
 
-void SENSOR::plot_ekf(std::vector<double> t)
+void SENSOR::plot_ekf()
 {
 	std::vector<double> x;
 	std::vector<double> y;
@@ -401,25 +401,25 @@ void SENSOR::plot_ekf(std::vector<double> t)
 	plt::subplot(3, 1, 1);
 		plt::ylabel("Est. Error - X [m]", {{"fontsize", "16"}});
 		plt::grid(true);
-		plt::named_plot("Est. Error", t, x, "b-");
-		plt::named_plot("2$\\sigma$", t, sigx, "r-");
-		plt::plot(t, nsigx, "r-");
+		plt::named_plot("Est. Error", x, "b-");
+		plt::named_plot("2$\\sigma$", sigx, "r-");
+		plt::plot(nsigx, "r-");
 		plt::ylim(5*nsigx.back(), 5*sigx.back());
 		plt::legend();
 	plt::subplot(3, 1, 2);
 		plt::ylabel("Est. Error - Y [m]", {{"fontsize", "16"}});
 		plt::grid(true);
-		plt::plot(t, y, "b-");
-		plt::plot(t, sigy, "r-");
-		plt::plot(t, nsigy, "r-");
+		plt::plot(y, "b-");
+		plt::plot(sigy, "r-");
+		plt::plot(nsigy, "r-");
 		plt::ylim(5*nsigy.back(), 5*sigy.back());
 	plt::subplot(3, 1, 3);
 		plt::ylabel("Est. Error - Z [m]", {{"fontsize", "16"}});
-		plt::xlabel("Time [s]", {{"fontsize", "16"}});
+		plt::xlabel("Update Step [k]", {{"fontsize", "16"}});
 		plt::grid(true);
-		plt::plot(t, z, "b-");
-		plt::plot(t, sigz, "r-");
-		plt::plot(t, nsigz, "r-");
+		plt::plot(z, "b-");
+		plt::plot(sigz, "r-");
+		plt::plot(nsigz, "r-");
 		plt::ylim(5*nsigz.back(), 5*sigz.back());
 	plt::show();
 

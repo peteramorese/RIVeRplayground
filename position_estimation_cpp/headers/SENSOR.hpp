@@ -36,12 +36,12 @@ public:
 	~SENSOR();
 	void set_constants();
 	mat get_sensor_frame(vec pos, vec pnt, CORE c);
-	void calibrate_sensor(std::vector<double> t, std::vector<std::vector<DATA>> Y, BAG b, CORE c, CONSTANTS cnst);
+	void calibrate_sensor(std::vector<std::vector<DATA>> Y, BAG b, CORE c, CONSTANTS cnst);
 	void set_position(vec pos);
-	void init_default_sensors(int id, CORE c);
+	void init_default_sensor(int id, CORE c);
 	std::vector<std::vector<DATA>> get_sim_data(BAG bag, std::vector<double> t, CORE c);
 	mat get_H_tilde(MARKER m);
-	void plot_ekf(std::vector<double> t);
+	void plot_ekf();
 	void plot_e_y(std::vector<double> t);
 
 private:
