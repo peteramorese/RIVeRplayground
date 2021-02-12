@@ -17,6 +17,7 @@ using namespace arma;
 class SENSOR
 {
 public:
+	// Data:
 	vec position; // [m] Position vector of the sensor
 	vec point; // [m] Point that the sensor is pointing at
 	mat frame; // Matrix defining the frame of the sensor
@@ -30,25 +31,30 @@ public:
 	mat R; // Measurement noise matrix
 	double dT; // [s] Sampling rate
 	int sid; // Sensor ID
+	bool sim; // Flag defining simulation
 
+	// Methods:
 	SENSOR();
 	SENSOR(vec pos, vec pnt);
 	~SENSOR();
-	void set_constants();
-	mat get_sensor_frame(vec pos, vec pnt, CORE c);
-	void calibrate_sensor(std::vector<std::vector<DATA>> Y, BAG b, CORE c, CONSTANTS cnst);
-	void set_position(vec pos);
 	void init_default_sensor(int id, CORE c);
-	std::vector<std::vector<DATA>> get_sim_data(BAG bag, std::vector<double> t, CORE c);
-	mat get_H_tilde(MARKER m);
+	void calibrate_sensor(std::vector<std::vector<DATA>> Y, BAG b, CORE c, CONSTANTS cnst);
 	void plot_ekf();
-	void plot_e_y(std::vector<double> t);
+	void plot_e_y();
 
 private:
+	// Data:
 	std::vector<EKF> ekf;
 	vec position_true; // [m] True position vector of the sensor
+
+	// Methods:
+	mat get_sensor_frame(vec pos, vec pnt, CORE c);
+	void set_params();
 	EKF ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE c, CONSTANTS cnst);
 	std::tuple<double, double> get_yhat(MARKER m, CORE c, bool sim);
+	void set_position(vec pos);
+	// std::vector<std::vector<DATA>> get_sim_data(BAG bag, std::vector<double> t, CORE c);
+	mat get_H_tilde(MARKER m);
 	
 	void update_sensor(vec pos_est);
 	

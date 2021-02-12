@@ -23,9 +23,6 @@ public:
 	void move_bag(vec x, double roll, double pitch, double yaw);
 	mat euler_angle_to_dcm(double roll, double pitch, double yaw);
 
-private:
-	bool sim;
-
 };
 
 #endif /* BAG_H */

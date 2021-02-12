@@ -25,6 +25,7 @@ void SYSTEM::init_default_sensors()
 	for(int i = 0; i < cnst.m; i++)
 	{
 		sensors.push_back(S);
+		sensors[i].sim = sim;
 		sensors[i].init_default_sensor(i, core);
 	}
 }
@@ -50,6 +51,7 @@ void SYSTEM::calibrate(BAG cal)
 		Y.push_back(Y_sid);
 	
 		sensors[i].calibrate_sensor(Y[i], cal, core, cnst);
+		sensors[i].plot_ekf();
 		cout << "DONE" << endl;
 	}
 }
