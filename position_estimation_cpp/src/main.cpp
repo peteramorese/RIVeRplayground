@@ -6,7 +6,8 @@ int main()
 {
 
 // Initialize SYSTEM object
-	SYSTEM system;
+	bool sim = true; // Set run mode to simulation
+	SYSTEM system(sim);
 
 // Initialize a bag to calibrate the sensors containing 3 markers
 	BAG calibrator(3);
@@ -16,6 +17,9 @@ int main()
 
 // Calibrate the Sensor System
 	system.calibrate(calibrator);
+
+	// system.get_data();
+	system.run_estimator();
 
 }
 

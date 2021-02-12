@@ -59,11 +59,13 @@ mat SENSOR::get_sensor_frame(vec pos, vec pnt, CORE c)
 	return S;
 }
 
+
 void SENSOR::set_params()
 {
-	R = 6*eye(2, 2);
+	R = 8*eye(2, 2);
 	dT = 1.0/60.0;
 }
+
 
 void SENSOR::init_default_sensor(int id, CORE c)
 {
@@ -174,14 +176,14 @@ EKF SENSOR::ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE core, CONSTAN
 
 	EKF e_kp1;
 	int num_meas = 0; // Number of measurements (corresponds to one for each marker)
-	std::vector<int> i_valid;
+	std::vector<int> mid_valid;
 
 	for(int i = 0; i < y_k.size(); i++)
 	{
-		if(~isnan(y_k[i].x))
+		if(isnan(y_k[i].x) == 0)
 		{
 			num_meas++; // Measurement is valid
-			i_valid.push_back(i); // Measurement is of Marker MID
+			mid_valid.push_back(y_k[i].mid); // Measurement is of Marker MID
 		}
 	}
 
@@ -197,15 +199,16 @@ EKF SENSOR::ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE core, CONSTAN
 		for(int i = 0; i < num_meas; i++)
 		{
 
-			yhat_tup = get_yhat(bag.markers[i_valid[i]], core, false); // Get predicted measurement
+			// cout << "Marker " << bag.markers[mid_valid[i]].position << endl;
+			yhat_tup = get_yhat(bag.markers[mid_valid[i]], core, false); // Get predicted measurement
 
 			yhat[2*i] = std::get<0>(yhat_tup); // Store yhat in a stacked vector
 			yhat[2*i+1] = std::get<1>(yhat_tup);
 
-			y[2*i] = y_k[i_valid[i]].x; // Store real measurements in a stacked vector
-			y[2*i+1] = y_k[i_valid[i]].y;
+			y[2*i] = y_k[mid_valid[i]].x; // Store real measurements in a stacked vector
+			y[2*i+1] = y_k[mid_valid[i]].y;
 
-			mat H = get_H_tilde(bag.markers[i_valid[i]]); 
+			mat H = get_H_tilde(bag.markers[mid_valid[i]]); 
 			H_tilde = std::move(arma::join_cols(H_tilde, H));
 
 			R_tmp = std::move(arma::join_rows(zeros(2, R_blk.n_cols), R));
@@ -217,7 +220,7 @@ EKF SENSOR::ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE core, CONSTAN
 
 		// Kalman gain matrix
 		mat K_tilde = e.P * H_tilde.t() * (H_tilde * e.P * H_tilde.t() + R_blk).i();
-
+		
 		e_kp1.x_hat = e.x_hat + K_tilde * e_kp1.e_y; // New state estimate
 
 		mat I = eye(cnst.n, cnst.n); // Identity
