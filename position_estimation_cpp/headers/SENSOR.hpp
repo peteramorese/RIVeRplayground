@@ -53,7 +53,6 @@ private:
 	EKF ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE c, CONSTANTS cnst);
 	std::tuple<double, double> get_yhat(MARKER m, CORE c, bool sim);
 	void set_position(vec pos);
-	// std::vector<std::vector<DATA>> get_sim_data(BAG bag, std::vector<double> t, CORE c);
 	mat get_H_tilde(MARKER m);
 	
 	void update_sensor(vec pos_est);

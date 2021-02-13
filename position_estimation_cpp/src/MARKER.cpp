@@ -12,21 +12,25 @@ namespace plt = matplotlibcpp;
 
 MARKER::MARKER()
 {
+	// Initializer
+
 	position = zeros<vec>(3);
 	mid = 0;
 	plate = 0;
 
-	init_ekf();
+	init_ekf(); // Initialize the EKF results
 }
 
 
 MARKER::MARKER(vec p, int m, int pl)
 {
+	// Initializer
+
 	position = p;
 	mid = m;
 	plate = pl;
 
-	init_ekf();
+	init_ekf(); // Initialize the EKF results
 }
 
 
@@ -35,6 +39,8 @@ MARKER::~MARKER(){};
 
 void MARKER::init_ekf()
 {
+	// Initialize the EKF results
+
 	EKF e;
 	e.x_hat = position;
 	e.P = {{pow(5, 2), 0, 0},
@@ -47,32 +53,52 @@ void MARKER::init_ekf()
 
 void MARKER::estimate_pos(vector<vector<DATA>> Y, vector<SENSOR_MIN> sensors, CORE core, CONSTANTS cnst)
 {
+	// Takes each collection of data for time k and runs an EKF update
+	// Adds the EKF update to ekf
+	// 
+	// Inputs:
+	// 		Y - [vector<vector<vector<DATA>>>] Multidimensional data vector containing all data of
+	// 			marker mid from each sensor for all time k. Y[mid][k][sid]
+	// 		core - [CORE] Object defining the Core Frame
+	// 		cnst - [CONSTANTS] Object defining system-wide constants
+	// 
 
 	EKF e;
 	vector<DATA> y_k;
 
-	updated = true; // Switch flag to indicate the marker has been estimated
-
 	for(int k = 0; k < Y.size(); k++)
 	{
-		// cout << "Y " << Y.size() << endl;
-		y_k = Y[k];
-		// cout << "sensors " << sensors[0].position << endl;
-		e = ekf_update(ekf[ekf.size()-1], sensors, y_k, core, cnst);
-		// cout << "After" << endl;
-		ekf.push_back(e);
-	}
+		if(Y[k].size() > 1) // Only perform EKF update if the marker has multiple sensor measurements
+		{
+			y_k = Y[k];
+			e = ekf_update(ekf[ekf.size()-1], sensors, y_k, core, cnst); // Perform an EKF update
+			ekf.push_back(e);
 
+			updated = true; // Switch flag to indicate the marker has been estimated
+		}
+	}
 }
 
 
 EKF MARKER::ekf_update(EKF e, vector<SENSOR_MIN> sensors, vector<DATA> y_k, CORE core, CONSTANTS cnst)
 {
+	// Completes a single EKF update given the previous step e and the data y_k
+	// 
+	// Inputs:
+	// 		e - [EKF] Object containing the EKF data from the previous update
+	// 		y_k - [vector<DATA>] Vector containing the data for marker mid at time k
+	// 		core - [CORE] Object defining the Core Frame
+	// 		cnst - [CONSTANTS] Object defining system-wide constants
+	// 
+	// Output:
+	// 		e_kp1 - [EKF] Updated EKF step
+	// 
+
 	EKF e_kp1;
 	int num_meas = 0; // Number of measurements
 	vector<int> sid_valid;
 
-	for(int i = 0; i < y_k.size(); i++)
+	for(int i = 0; i < y_k.size(); i++) // Check each sensor for a valid measurement
 	{
 		if(isnan(y_k[i].x) == 0)
 		{
@@ -81,7 +107,7 @@ EKF MARKER::ekf_update(EKF e, vector<SENSOR_MIN> sensors, vector<DATA> y_k, CORE
 		}
 	}
 
-	if(num_meas > 0)
+	if(num_meas > 1) // Only perform an EKF update if there are multiple measurements of the marker mid
 	{
 		tuple<double, double> yhat_tup;
 		vec yhat(cnst.p*num_meas);
@@ -90,7 +116,7 @@ EKF MARKER::ekf_update(EKF e, vector<SENSOR_MIN> sensors, vector<DATA> y_k, CORE
 		mat R_tmp;
 		mat R_blk;
 
-		for(int i = 0; i < num_meas; i++)
+		for(int i = 0; i < num_meas; i++) // For each measurement
 		{
 			yhat_tup = get_yhat(sensors[sid_valid[i]], core);
 
@@ -127,10 +153,10 @@ EKF MARKER::ekf_update(EKF e, vector<SENSOR_MIN> sensors, vector<DATA> y_k, CORE
 
 	if(sim == true) // If software is running in simulation mode
 	{
-		e_kp1.e_x = e_kp1.x_hat - position_true;
+		e_kp1.e_x = e_kp1.x_hat - position_true; // Estimation error
 	}
 
-	position = e_kp1.x_hat; // Update state estimate
+	position = e_kp1.x_hat; // Update position with state estimate
 
 	return e_kp1;
 }
@@ -138,6 +164,17 @@ EKF MARKER::ekf_update(EKF e, vector<SENSOR_MIN> sensors, vector<DATA> y_k, CORE
 
 tuple<double, double> MARKER::get_yhat(SENSOR_MIN s, CORE core)
 {
+	// Simulates the measurement of Marker mid by Sensor sid using the nonlinear measurement model
+	// 
+	// Inputs:
+	// 		s - [SENSOR_MIN] Sensor to simulate the measurement from
+	// 		core - [CORE] Object defining the Core Frame
+	// 		sim - [bool] Flag defining the software run mode
+	// 
+	// Output:
+	// 		<x, y> - [tuple<double, double>] Simulated measurement
+	// 
+
 	tuple<double, double> yhat;
 
 	double x_max = s.x_max;
@@ -173,6 +210,16 @@ tuple<double, double> MARKER::get_yhat(SENSOR_MIN s, CORE core)
 
 mat MARKER::get_H_tilde(SENSOR_MIN s, CORE core)
 {
+	// Computes the Jacobian dh/dx = H_tilde to be used in the EKF update
+	// 
+	// Inputs:
+	// 		s - [SENSOR_MIN] Sensor to simulate the measurement from
+	// 		core - [CORE] Object defining the Core Frame
+	// 
+	// Output:
+	// 		H_tilde - [mat] Jacobian dh/dx
+	// 
+
 	vec x = position;
 	vec s_pos = s.position;
 	double x_max = s.x_max;
@@ -208,6 +255,8 @@ mat MARKER::get_H_tilde(SENSOR_MIN s, CORE core)
 
 void MARKER::plot_ekf()
 {
+	// Plot the results from the EKF
+
 	std::vector<double> x;
 	std::vector<double> y;
 	std::vector<double> z;
@@ -221,26 +270,26 @@ void MARKER::plot_ekf()
 
 	for(int i = 1; i < ekf.size()-1; i++)
 	{
-		if(sim == true)
+		if(sim == true) // If running in simulation mode
 		{
-			x.push_back(ekf[i].e_x(0));
+			x.push_back(ekf[i].e_x(0)); // Plot the estimation errors
 			y.push_back(ekf[i].e_x(1));
 			z.push_back(ekf[i].e_x(2));
 
-			sigx.push_back(2.0*sqrt(ekf[i].P(0, 0)));
+			sigx.push_back(2.0*sqrt(ekf[i].P(0, 0))); // 2 Sigma
 			sigy.push_back(2.0*sqrt(ekf[i].P(1, 1)));
 			sigz.push_back(2.0*sqrt(ekf[i].P(2, 2)));
 			nsigx.push_back(-2.0*sqrt(ekf[i].P(0, 0)));
 			nsigy.push_back(-2.0*sqrt(ekf[i].P(1, 1)));
 			nsigz.push_back(-2.0*sqrt(ekf[i].P(2, 2)));
 		}
-		else
+		else // If not running in simulation mode
 		{
-			x.push_back(ekf[i].x_hat(0));
+			x.push_back(ekf[i].x_hat(0)); // Plot the state estimates
 			y.push_back(ekf[i].x_hat(1));
 			z.push_back(ekf[i].x_hat(2));
 
-			sigx.push_back(ekf[i].x_hat(0) + 2.0*sqrt(ekf[i].P(0, 0)));
+			sigx.push_back(ekf[i].x_hat(0) + 2.0*sqrt(ekf[i].P(0, 0))); // 2 Sigma bounds + state estimate
 			sigy.push_back(ekf[i].x_hat(1) + 2.0*sqrt(ekf[i].P(1, 1)));
 			sigz.push_back(ekf[i].x_hat(2) + 2.0*sqrt(ekf[i].P(2, 2)));
 			nsigx.push_back(ekf[i].x_hat(0) - 2.0*sqrt(ekf[i].P(0, 0)));
@@ -336,6 +385,8 @@ void MARKER::plot_ekf()
 
 void MARKER::plot_e_y()
 {
+	// Plot the measurement innovations from the EKF
+	
 	std::vector<double> x;
 	std::vector<double> y;
 	std::vector<double> z;

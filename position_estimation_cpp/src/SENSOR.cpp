@@ -14,18 +14,22 @@ namespace plt = matplotlibcpp;
 
 SENSOR::SENSOR()
 {
+	// Initializer for the SENSOR class
+
 	position = zeros<vec>(3);
 	position_true = zeros<vec>(3);
 	point = zeros<vec>(3);
 	frame = zeros<mat>(3, 3);
 	Q_C = zeros<mat>(3, 3);
 
-	set_params();
+	set_params(); // Set sensor parameters
 }
 
 
 SENSOR::SENSOR(vec pos, vec pnt)
 {
+	// Initializer for the SENSOR class
+
 	position = pos;
 	position_true = zeros<vec>(3);
 	point = pnt;
@@ -33,38 +37,11 @@ SENSOR::SENSOR(vec pos, vec pnt)
 	frame = get_sensor_frame(pos, pnt, c);
 	Q_C = c.frame * frame;
 
-	set_params();
+	set_params(); // Set the sensor parameters
 }
 
 
 SENSOR::~SENSOR(){};
-
-
-mat SENSOR::get_sensor_frame(vec pos, vec pnt, CORE c)
-{
-	vec z = pnt - pos;
-	z = normalise(z);
-
-	vec x = cross(z, c.frame.col(2));
-	x = normalise(x);
-
-	vec y = cross(z, x);
-
-	mat S(3, 3);
-
-	S.col(0) = x;
-	S.col(1) = y;
-	S.col(2) = z;
-
-	return S;
-}
-
-
-void SENSOR::set_params()
-{
-	R = 8*eye(2, 2);
-	dT = 1.0/60.0;
-}
 
 
 void SENSOR::init_default_sensor(int id, CORE c)
@@ -79,7 +56,7 @@ void SENSOR::init_default_sensor(int id, CORE c)
 
 	sid = id;
 
-	if(id == 0)
+	if(id == 0) // Sensor 0
 	{
 		position = {0.5, -0.55, -0.98};
 		point = {0, 0, 0};
@@ -88,7 +65,7 @@ void SENSOR::init_default_sensor(int id, CORE c)
 			position_true = {0.5888, -0.3422, -0.9577};
 		}
 	}
-	else if(id == 1)
+	else if(id == 1) // Sensor 1
 	{
 		position = {0.56, 0.52, -0.6};
 		point = {0, 0, 0};
@@ -97,7 +74,7 @@ void SENSOR::init_default_sensor(int id, CORE c)
 			position_true = {0.5230, 0.5525, -0.4486};
 		}
 	}
-	else if(id == 2)
+	else if(id == 2) // Sensor 2
 	{
 		position = {0.56, 0.52, 0.6};
 		point = {0, 0, 0};
@@ -106,20 +83,80 @@ void SENSOR::init_default_sensor(int id, CORE c)
 			position_true = {0.5365, 0.6307, 0.4397};
 		}
 	}
-	else if(id == 3)
+	else if(id == 3) // Sensor 3
 	{
-
+		position = {0.50, -0.55, 0.98};
+		point = {0, 0, 0};
+		if(sim == true)
+		{
+			position_true = position;
+			// position_true = {0.5365, 0.6307, 0.4397};
+		}
 	}
-	else if(id == 4)
+	else if(id == 4) // Sensor 4
 	{
-
+		position = {2.23, -1.16, 0.61};
+		point = {0, 0, 0};
+		if(sim == true)
+		{
+			position_true = position;
+			// position_true = {0.5365, 0.6307, 0.4397};
+		}
+	}
+	else if(id == 5) // Sensor 5
+	{
+		position = {3.21, -0.54, 0.98};
+		point = {0, 0, 0};
+		if(sim == true)
+		{
+			position_true = position;
+			// position_true = {0.5365, 0.6307, 0.4397};
+		}
+	}
+	else if(id == 6) // Sensor 6
+	{
+		position = {3.80, -0.22, 0.0};
+		point = {0, 0, 0};
+		if(sim == true)
+		{
+			position_true = position;
+			// position_true = {0.5365, 0.6307, 0.4397};
+		}
+	}
+	else if(id == 7) // Sensor 7
+	{
+		position = {3.19, -0.54, 0.99};
+		point = {0, 0, 0};
+		if(sim == true)
+		{
+			position_true = position;
+			// position_true = {0.5365, 0.6307, 0.4397};
+		}
+	}
+	else if(id == 8) // Sensor 8
+	{
+		position = {2.22, -1.16, -0.60};
+		point = {0, 0, 0};
+		if(sim == true)
+		{
+			position_true = position;
+			// position_true = {0.5365, 0.6307, 0.4397};
+		}
+	}
+	else if(id == 9) // Sensor 9
+	{
+		position = {};
+		point = {0, 0, 0};
+		if(sim == true)
+		{
+			position_true = position;
+			// position_true = {0.5365, 0.6307, 0.4397};
+		}
 	}
 
-	// cout << "true = \n" << position_true << endl;
-	// cout << "est = \n" << position << endl;
+	frame = get_sensor_frame(position, point, c); // Compute the sensor's pointing frame
 
-	frame = get_sensor_frame(position, point, c);
-
+	// Initialize the first EKF step
 	EKF e;
 	e.x_hat = position;
 	e.P = 2*eye(3, 3);
@@ -129,6 +166,50 @@ void SENSOR::init_default_sensor(int id, CORE c)
 	}
 
 	ekf.push_back(e);
+}
+
+
+mat SENSOR::get_sensor_frame(vec pos, vec pnt, CORE c)
+{
+	// Compute the frame matrix defining the pointing of the sensor
+	// 
+	// Inputs:
+	// 		pos - [vec] [3x1] [m] Position vector to initialize with
+	// 		pnt - [vec] [3x1] [m] Pointing vector to initialize with
+	// 		c - [CORE] Object defining the Core Frame
+	// 
+	// Output:
+	// 		S - [mat] [3x3] Matrix defining the sensor frame
+	// 
+
+	// Z-axis (sensor frame) points directly at the point pnt
+	vec z = pnt - pos;
+	z = normalise(z);
+
+	// X-axis (sensor frame) is normal to both the sensor Z-axis and the Core Z-axis
+	// Corresponds to the sensor being level to the ground
+	vec x = cross(z, c.frame.col(2));
+	x = normalise(x);
+
+	// Y-axis (sensor frame) completes the right handed coordinate system
+	vec y = cross(z, x);
+
+	mat S(3, 3);
+
+	S.col(0) = x;
+	S.col(1) = y;
+	S.col(2) = z;
+
+	return S;
+}
+
+
+void SENSOR::set_params()
+{
+	// Set the sensor parameters
+
+	R = 8*eye(2, 2); // Measurement noise covariance matrix
+	dT = 1.0/60.0; // [s] Sampling rate
 }
 
 
@@ -172,7 +253,6 @@ EKF SENSOR::ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE core, CONSTAN
 	// Outputs:
 	// 		EKF e_upd - Updated EKF step
 	// 
-
 
 	EKF e_kp1;
 	int num_meas = 0; // Number of measurements (corresponds to one for each marker)
@@ -333,6 +413,8 @@ std::tuple<double, double> SENSOR::get_yhat(MARKER m, CORE c, bool sim = false)
 mat SENSOR::get_H_tilde(MARKER m)
 {
 	// Function to find the H_tilde matrix for calibration of the sensor positioning system
+	// Jacobian was computed symbolically in Mathematica and hand-typed here
+	// Results were compared between this and the Mathematica output
 	// 
 	// Inputs:
 	// 		MARKER m - Object containing the position of the marker being measured
@@ -465,6 +547,8 @@ mat SENSOR::get_H_tilde(MARKER m)
 
 void SENSOR::plot_ekf()
 {
+	// Plot the results of the Extended Kalman Filter (EKF) used to calibrate the sensor position
+
 	std::vector<double> x;
 	std::vector<double> y;
 	std::vector<double> z;
@@ -478,26 +562,26 @@ void SENSOR::plot_ekf()
 
 	for(int i = 1; i < ekf.size()-1; i++)
 	{
-		if(sim == true)
+		if(sim == true) // If software run mode is simulation
 		{
-			x.push_back(ekf[i].e_x(0));
+			x.push_back(ekf[i].e_x(0)); // Plot estimation error
 			y.push_back(ekf[i].e_x(1));
 			z.push_back(ekf[i].e_x(2));
 
-			sigx.push_back(2.0*sqrt(ekf[i].P(0, 0)));
+			sigx.push_back(2.0*sqrt(ekf[i].P(0, 0))); // 2 Sigma bounds
 			sigy.push_back(2.0*sqrt(ekf[i].P(1, 1)));
 			sigz.push_back(2.0*sqrt(ekf[i].P(2, 2)));
 			nsigx.push_back(-2.0*sqrt(ekf[i].P(0, 0)));
 			nsigy.push_back(-2.0*sqrt(ekf[i].P(1, 1)));
 			nsigz.push_back(-2.0*sqrt(ekf[i].P(2, 2)));
 		}
-		else
+		else // If software run mode is not simulation
 		{
-			x.push_back(ekf[i].x_hat(0));
+			x.push_back(ekf[i].x_hat(0)); // Plot state estimate
 			y.push_back(ekf[i].x_hat(1));
 			z.push_back(ekf[i].x_hat(2));
 
-			sigx.push_back(ekf[i].x_hat(0) + 2.0*sqrt(ekf[i].P(0, 0)));
+			sigx.push_back(ekf[i].x_hat(0) + 2.0*sqrt(ekf[i].P(0, 0))); // 2 Sigma bounds + estimate
 			sigy.push_back(ekf[i].x_hat(1) + 2.0*sqrt(ekf[i].P(1, 1)));
 			sigz.push_back(ekf[i].x_hat(2) + 2.0*sqrt(ekf[i].P(2, 2)));
 			nsigx.push_back(ekf[i].x_hat(0) - 2.0*sqrt(ekf[i].P(0, 0)));
@@ -507,6 +591,8 @@ void SENSOR::plot_ekf()
 
 
 	}
+
+	// Figure formatting and plotting
 
 	std::stringstream ttl;
 
@@ -593,6 +679,8 @@ void SENSOR::plot_ekf()
 
 void SENSOR::plot_e_y()
 {
+	// Plot the measurement innovation results from the calibration Extended Kalman Filter
+
 	std::vector<double> x;
 	std::vector<double> y;
 	std::vector<double> z;
@@ -620,46 +708,3 @@ void SENSOR::plot_e_y()
 	plt::plot(z, "b-");
 	plt::show();
 }
-
-
-// std::vector<std::vector<DATA>> SENSOR::get_sim_data(BAG bag, std::vector<double> t, CORE c)
-// {
-// 	// Create simulated pixy sensor data of specified markers for a given sensor.
-// 	// Simulated data to be used in testing of the position Extended Kalman Filter
-// 	//
-// 	// Inputs:
-// 	//		BAG bag - Object containing the bag information to simulate
-// 	//		vector t - [s] Time vector
-// 	//		CORE c - Object defining the Core Frame
-// 	//
-// 	// Outputs:
-// 	//		vector<vector<DATA>> Y_sid - Vector containing the measurements from Sensor SID of each marker for each time step k
-
-
-// 	std::vector<std::vector<DATA>> Y_sid; // Vector of vectors containing Sensor SID measurements
-// 	std::vector<DATA> Y_k; // Vector containing Sensor SID measurements at time k
-// 	DATA y_mid; // Measurements of Marker MID at time k by Sensor SID
-
-// 	for(int k = 0; k < t.size(); k++) // For each time step
-// 	{
-// 		Y_k.clear(); // Clear the time measurement vector
-
-// 		for(int j = 0; j < bag.markers.size(); j++) // For each marker
-// 		{
-// 			std::tuple<double, double> y_k_tmp = get_yhat(bag.markers[j], c, true); // Get the measurement of MID by SID
-
-// 			// Assign measurement fields
-// 			y_mid.x = std::get<0>(y_k_tmp);
-// 			y_mid.y = std::get<1>(y_k_tmp);
-// 			y_mid.mid = j;
-// 			y_mid.sid = sid;
-			
-// 			Y_k.push_back(y_mid); // Add measurement to the vector
-// 		}
-
-// 		Y_sid.push_back(Y_k); // Add MID measurements to the vector
-
-// 	}
-
-// 	return Y_sid;
-// }

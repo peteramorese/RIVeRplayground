@@ -5,3 +5,20 @@ position_estimation_cpp is the library used to estimate the position of defined 
 ## Usage
 
 Change directory to `/position_estimation_cpp/build`. Run:
+```
+mkdir build
+cd build
+cmake ..
+make
+```
+Run the executable:
+```
+./positionDetermination
+```
+
+## Dependencies
+
+Must have the following libraries installed:
+- Armadillo
+- Python 2.7 or higher
+- Matplotlib cpp (included in repository)

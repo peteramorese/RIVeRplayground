@@ -6,6 +6,9 @@
 #include <armadillo>
 using namespace arma;
 
+// Defining the SENSOR_MIN class
+// Minimal Sensor objects contain only the information necessary to perform marker estimation
+// Populated after calibration has been completed
 class SENSOR_MIN
 {
 public:
@@ -31,6 +34,7 @@ public:
 	~SENSOR_MIN();
 	mat get_sensor_frame(vec, vec, CORE);
 	void set_params();
+
 };
 
 #endif

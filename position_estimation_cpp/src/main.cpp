@@ -1,5 +1,5 @@
 #include "SYSTEM.hpp"
-#include "matplotlibcpp.h"
+// #include "matplotlibcpp.h"
 using namespace std;
 
 int main()
@@ -7,7 +7,8 @@ int main()
 
 // Initialize SYSTEM object
 	bool sim = true; // Set run mode to simulation
-	SYSTEM system(sim);
+	bool plot = true; // Set the plot flag
+	SYSTEM system(sim, plot);
 
 // Initialize a bag to calibrate the sensors containing 3 markers
 	BAG calibrator(3);

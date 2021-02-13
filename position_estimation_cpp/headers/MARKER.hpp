@@ -16,12 +16,12 @@ class SENSOR;
 class MARKER
 {
 public:
-	vec position;
-	vec position_true;
-	int mid;
-	bool plate;
-	bool sim;
-	bool updated = false;
+	vec position; // [m] Position vector of the marker
+	vec position_true; // [m] True position vector of the marker (only known in simulation)
+	int mid; // Marker ID
+	bool plate; // Flag if marker contains a magnetic steel plate
+	bool sim; // Software run mode flag
+	bool updated = false; // Flag if marker's position was estimated. Used to pass on to orientation algorithm
 
 	MARKER();
 	MARKER(vec p, int m, int pl);
@@ -31,13 +31,12 @@ public:
 	void plot_e_y();
 
 private:
-	std::vector<EKF> ekf;
+	std::vector<EKF> ekf; // EKF results
 
 	void init_ekf();
 	EKF ekf_update(EKF, vector<SENSOR_MIN>, vector<DATA>, CORE, CONSTANTS);
 	tuple<double, double> get_yhat(SENSOR_MIN, CORE);
 	mat get_H_tilde(SENSOR_MIN, CORE core);
-
 	
 };
 

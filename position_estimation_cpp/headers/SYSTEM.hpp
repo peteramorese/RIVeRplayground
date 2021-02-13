@@ -6,7 +6,6 @@
 #include "SENSOR.hpp"
 #include "SENSOR_MIN.hpp"
 #include "EKF.hpp"
-// #include "addtl_func.hpp"
 
 #include "matplotlibcpp.h"
 
@@ -24,14 +23,14 @@ class SYSTEM
 {
 public:
 	bool sim; // Flag defining simulation run mode
+	bool plot = false; // Flag to plot results
 
-	SYSTEM(bool s = true);
+	SYSTEM(bool s = true, bool p = false);
 	~SYSTEM();
 	void set_sim_flag(bool);
 	void assign_bag(BAG);
 	void calibrate(BAG);
 	void run_estimator();
-
 	void get_data();
 
 private:
@@ -43,10 +42,7 @@ private:
 	vector<vector<vector<DATA>>> Y; // Vector to store data in
 
 	void init_default_sensors();
-	
 	vector<vector<DATA>> read_data(string);
 	void set_sensors_min();
 	vector<vector<vector<DATA>>> reorg_data();
-
-
 };

@@ -18,7 +18,7 @@ include_directories(${PYTHON_INCLUDE_DIR})
 
 
 # add the executable
-add_executable(main ${SOURCES})
+add_executable(positionDetermination ${SOURCES})
 
-target_link_libraries(main ${ARMADILLO_LIBRARIES})
-target_link_libraries(main ${PYTHON_LIBRARY})
+target_link_libraries(positionDetermination ${ARMADILLO_LIBRARIES})
+target_link_libraries(positionDetermination ${PYTHON_LIBRARY})
