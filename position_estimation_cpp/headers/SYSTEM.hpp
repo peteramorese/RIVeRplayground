@@ -25,8 +25,10 @@ class SYSTEM
 public:
 	bool sim; // Flag defining simulation run mode
 
-	SYSTEM(bool);
+	SYSTEM(bool s = true);
 	~SYSTEM();
+	void set_sim_flag(bool);
+	void assign_bag(BAG);
 	void calibrate(BAG);
 	void run_estimator();
 

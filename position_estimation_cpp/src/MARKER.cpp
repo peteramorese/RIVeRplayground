@@ -51,6 +51,8 @@ void MARKER::estimate_pos(vector<vector<DATA>> Y, vector<SENSOR_MIN> sensors, CO
 	EKF e;
 	vector<DATA> y_k;
 
+	updated = true; // Switch flag to indicate the marker has been estimated
+
 	for(int k = 0; k < Y.size(); k++)
 	{
 		// cout << "Y " << Y.size() << endl;
@@ -58,6 +60,7 @@ void MARKER::estimate_pos(vector<vector<DATA>> Y, vector<SENSOR_MIN> sensors, CO
 		// cout << "sensors " << sensors[0].position << endl;
 		e = ekf_update(ekf[ekf.size()-1], sensors, y_k, core, cnst);
 		// cout << "After" << endl;
+		ekf.push_back(e);
 	}
 
 }
@@ -66,8 +69,140 @@ void MARKER::estimate_pos(vector<vector<DATA>> Y, vector<SENSOR_MIN> sensors, CO
 EKF MARKER::ekf_update(EKF e, vector<SENSOR_MIN> sensors, vector<DATA> y_k, CORE core, CONSTANTS cnst)
 {
 	EKF e_kp1;
+	int num_meas = 0; // Number of measurements
+	vector<int> sid_valid;
+
+	for(int i = 0; i < y_k.size(); i++)
+	{
+		if(isnan(y_k[i].x) == 0)
+		{
+			num_meas++; // Measurement is valid
+			sid_valid.push_back(y_k[i].sid);
+		}
+	}
+
+	if(num_meas > 0)
+	{
+		tuple<double, double> yhat_tup;
+		vec yhat(cnst.p*num_meas);
+		vec y(cnst.p*num_meas);
+		mat H_tilde;
+		mat R_tmp;
+		mat R_blk;
+
+		for(int i = 0; i < num_meas; i++)
+		{
+			yhat_tup = get_yhat(sensors[sid_valid[i]], core);
+
+			yhat[2*i] = std::get<0>(yhat_tup); // Store yhat in a stacked vector
+			yhat[2*i+1] = std::get<1>(yhat_tup);
+
+			y[2*i] = y_k[sid_valid[i]].x; // Store real measurements in a stacked vector
+			y[2*i+1] = y_k[sid_valid[i]].y;
+
+			mat H = get_H_tilde(sensors[sid_valid[i]], core);
+			H_tilde = std::move(arma::join_cols(H_tilde, H));
+
+			R_tmp = std::move(arma::join_rows(zeros(2, R_blk.n_cols), sensors[sid_valid[i]].R));
+			R_blk = std::move(arma::join_rows(R_blk, zeros(R_blk.n_rows, 2)));
+			R_blk = std::move(arma::join_cols(R_blk, R_tmp));
+		}
+
+		e_kp1.e_y = y - yhat; // Measurement Innovation
+
+		// Kalman gain matrix
+		mat K_tilde = e.P * H_tilde.t() * (H_tilde * e.P * H_tilde.t() + R_blk).i();
+
+		e_kp1.x_hat = e.x_hat + K_tilde * e_kp1.e_y; // New state estimate
+
+		mat I = eye(cnst.n, cnst.n);
+
+		e_kp1.P = (I - K_tilde * H_tilde) * e.P; // New covariance matrix
+	}
+	else // No measurement update
+	{
+		e_kp1.x_hat = e.x_hat;
+		e_kp1.P = e.P;
+	}
+
+	if(sim == true) // If software is running in simulation mode
+	{
+		e_kp1.e_x = e_kp1.x_hat - position_true;
+	}
+
+	position = e_kp1.x_hat; // Update state estimate
 
 	return e_kp1;
+}
+
+
+tuple<double, double> MARKER::get_yhat(SENSOR_MIN s, CORE core)
+{
+	tuple<double, double> yhat;
+
+	double x_max = s.x_max;
+	double y_max = s.y_max;
+	double gamma_rad = s.gamma * M_PI / 180.0; // [rad] Horizontal FOV half-angle
+	double theta_rad = s.theta * M_PI / 180.0; // [rad] Vertical FOV half-angle
+
+	mat T = {{tan(gamma_rad), 0, 0},
+			{0, tan(theta_rad), 0},
+			{0, 0, 1}};
+
+	mat DELTA = {{2.0/x_max, 0},
+			{0, 2.0/y_max},
+			{0, 0}};
+
+	vec ivec = {1.0, 1.0, -1.0};
+
+	vec V_S = s.frame.t() * core.frame.t() * (position - s.position);
+	double a = V_S[2];
+
+	mat H = (1.0/a) * (DELTA.t() * DELTA).i() * DELTA.t() * T.i() * s.frame.t() * core.frame.t();
+	mat G = -(1.0/a) * (DELTA.t() * DELTA).i() * DELTA.t() * T.i() * s.frame.t() * core.frame.t() * s.position +
+		(DELTA.t() * DELTA).i() * DELTA.t() * ivec;
+
+	vec yhat_vec = H * position + G;
+
+	std::get<0>(yhat) = yhat_vec[0];
+	std::get<1>(yhat) = yhat_vec[1];
+
+	return yhat;
+}
+
+
+mat MARKER::get_H_tilde(SENSOR_MIN s, CORE core)
+{
+	vec x = position;
+	vec s_pos = s.position;
+	double x_max = s.x_max;
+	double y_max = s.y_max;
+	double gamma_rad = s.gamma * M_PI / 180.0; // [rad] Horizontal FOV half-angle
+	double theta_rad = s.theta * M_PI / 180.0; // [rad] Vertical FOV half-angle
+
+	mat T = {{tan(gamma_rad), 0, 0},
+			{0, tan(theta_rad), 0},
+			{0, 0, 1}};
+
+	mat DELTA = {{2.0/x_max, 0},
+			{0, 2.0/y_max},
+			{0, 0}};
+
+	vec ivec = {1.0, 1.0, -1.0};
+
+	vec z = s.frame.row(2).t();
+
+	rowvec d1_a_dx = {-z[0]*(z[0]*(x[0] - s_pos[0]) + z[1]*(x[1] - s_pos[1]) + z[2]*(x[2] - s_pos[2])),
+				-z[1]*(z[0]*(x[0] - s_pos[0]) + z[1]*(x[1] - s_pos[1]) + z[2]*(x[2] - s_pos[2])),
+				-z[2]*(z[0]*(x[0] - s_pos[0]) + z[1]*(x[1] - s_pos[1]) + z[2]*(x[2] - s_pos[2]))};
+
+	vec V_S1 = s.frame.t() * core.frame.t() * (x - s_pos);
+	double a = V_S1[2];
+
+	mat H_tilde = (1.0/a)*(DELTA.t() * DELTA).i() * DELTA.t() * T.i() * s.frame.t() * core.frame.t() +
+		(DELTA.t() * DELTA).i() * DELTA.t() * T.i() * s.frame.t() * core.frame.t() * x * d1_a_dx;
+
+	return H_tilde;
 }
 
 

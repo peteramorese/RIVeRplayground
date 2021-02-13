@@ -17,6 +17,7 @@ class MARKER
 {
 public:
 	vec position;
+	vec position_true;
 	int mid;
 	bool plate;
 	bool sim;
@@ -26,16 +27,16 @@ public:
 	MARKER(vec p, int m, int pl);
 	~MARKER();
 	void estimate_pos(vector<vector<DATA>>, vector<SENSOR_MIN>, CORE, CONSTANTS);
+	void plot_ekf();
+	void plot_e_y();
 
 private:
 	std::vector<EKF> ekf;
 
 	void init_ekf();
 	EKF ekf_update(EKF, vector<SENSOR_MIN>, vector<DATA>, CORE, CONSTANTS);
-	tuple<double, double> get_yhat(SENSOR_MIN, CORE, bool);
-	mat get_H_tilde(SENSOR_MIN);
-	void plot_ekf();
-	void plot_e_y();
+	tuple<double, double> get_yhat(SENSOR_MIN, CORE);
+	mat get_H_tilde(SENSOR_MIN, CORE core);
 
 	
 };

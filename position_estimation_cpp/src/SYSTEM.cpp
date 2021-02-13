@@ -13,6 +13,8 @@ SYSTEM::SYSTEM(bool s)
 
 	init_default_sensors();
 
+	set_sim_flag(s);
+
 	cout << "DONE" << endl;
 };
 
@@ -33,6 +35,44 @@ void SYSTEM::init_default_sensors()
 }
 
 
+void SYSTEM::set_sim_flag(bool s)
+{
+	sim = s;
+	
+	for(int i = 0; i < bag.markers.size(); i++)
+	{
+		bag.markers[i].sim = sim;
+	}
+
+	for(int i = 0; i < sensors.size(); i++)
+	{
+		sensors[i].sim = sim;
+	}
+
+	for(int i = 0; i < sensors_min.size(); i++)
+	{
+		sensors_min[i].sim = sim;
+	}
+
+}
+
+
+void SYSTEM::assign_bag(BAG b)
+{
+	bag = b;
+
+	if(sim == true)
+	{
+		for(int i = 0; i < bag.markers.size(); i++)
+		{
+			bag.markers[i].position_true = b.markers[i].position;
+		}
+	}
+
+	set_sim_flag(sim);
+}
+
+
 void SYSTEM::calibrate(BAG cal)
 {
 	cout << "Calibrating Sensors..." << endl;;
@@ -44,7 +84,7 @@ void SYSTEM::calibrate(BAG cal)
 		cout << "\tCalibrating Sensor " << i << "...\t\t";
 
 		sensors[i].calibrate_sensor(Y[i], cal, core, cnst);
-		sensors[i].plot_ekf();
+		// sensors[i].plot_ekf();
 		cout << "DONE" << endl;
 	}
 
@@ -141,22 +181,16 @@ void SYSTEM::run_estimator()
 
 	Y_reorg = reorg_data(); // Reorganize the data vector
 
-	cout << endl << Y_reorg.size() << "  " << Y_reorg[3].size() << "  " << Y_reorg[0][0].size() << endl;
-
 	for(int mid = 0; mid < Y_reorg.size(); mid++)
 	{
 		if(Y_reorg[mid].size() > 0)
 		{
-			cout << "Measurements found! " << Y_reorg[mid].size() << endl;
 			bag.markers[mid].estimate_pos(Y_reorg[mid], sensors_min, core, cnst);
-		}
-		else
-		{
-			cout << "No measurements found :(" << endl;
+			bag.markers[mid].plot_ekf();
 		}
 	}
 
-
+	cout << "DONE" << endl;
 }
 
 
@@ -177,8 +211,6 @@ void SYSTEM::set_sensors_min()
 
 		sensors_min.push_back(s_min);
 	}
-
-	cout << "sensors min " << sensors_min.size() << endl;
 }
 
 

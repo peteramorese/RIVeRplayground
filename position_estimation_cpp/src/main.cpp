@@ -15,6 +15,8 @@ int main()
 	calibrator.markers[1].position = {0.05, -0.05, 0.1};
 	calibrator.markers[2].position = {0.1, -0.05, 0};
 
+	system.assign_bag(calibrator);
+
 // Calibrate the Sensor System
 	system.calibrate(calibrator);
 
