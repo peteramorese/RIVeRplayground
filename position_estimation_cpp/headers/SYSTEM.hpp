@@ -7,6 +7,9 @@
 #include "SENSOR_MIN.hpp"
 #include "EKF.hpp"
 
+#include "oriDetermine.h"
+#include "matrix.h"
+
 #include "matplotlibcpp.h"
 
 #include <iostream>
@@ -32,6 +35,7 @@ public:
 	void calibrate(BAG);
 	void run_estimator();
 	void get_data();
+
 
 private:
 	CORE core; // Object defining the core frame

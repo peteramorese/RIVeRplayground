@@ -64,7 +64,6 @@ void SYSTEM::set_sim_flag(bool s)
 	{
 		sensors_min[i].sim = sim;
 	}
-
 }
 
 
@@ -258,7 +257,7 @@ void SYSTEM::run_estimator()
 	// Uses Pixy sensor data to run an Extended Kalman Filter (EKF) for each marker that contains measurements
 	// 
 
-	cout << "Running Estimator..." << endl;
+	cout << "Running Position Estimator..." << endl;
 
 	vector<vector<vector<DATA>>> Y_reorg;
 
@@ -280,6 +279,12 @@ void SYSTEM::run_estimator()
 			cout << "DONE" << endl;
 		}
 	}
+
+	cout << "Running Orientation Estimator..." << endl;
+
+	bag.estimate_ori();
+
+	cout << "DONE" << endl;
 }
 
 

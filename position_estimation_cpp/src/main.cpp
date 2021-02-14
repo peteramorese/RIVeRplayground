@@ -21,7 +21,7 @@ int main()
 // Calibrate the Sensor System
 	system.calibrate(calibrator);
 
-	// system.get_data();
+// Run the bag estimator
 	system.run_estimator();
 
 }

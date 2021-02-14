@@ -2,6 +2,8 @@
 #define BAG_H
 
 #include "MARKER.hpp"
+#include "oriDetermine.h"
+#include "matrix.h"
 
 #include <armadillo>
 using namespace arma;
@@ -22,7 +24,11 @@ public:
 	~BAG();
 	void move_bag(vec x, double roll, double pitch, double yaw);
 	mat euler_angle_to_dcm(double roll, double pitch, double yaw);
+	void estimate_ori();
 
+private:
+	std::vector<std::pair<double[3], int>> get_bag_pair();
+	std::vector<std::pair<double[3], int>> get_coords_3D();
 };
 
 #endif /* BAG_H */
