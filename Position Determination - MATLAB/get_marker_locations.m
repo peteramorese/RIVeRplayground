@@ -22,15 +22,6 @@ function [BAG_mod] = get_marker_locations(BAG, x, roll, pitch, yaw)
 
 BAG_mod = BAG;
 
-% Shift the marker positions
-BAG_mod.x = x;
-BAG_mod.markers.M1 = x + BAG.markers.M1;
-BAG_mod.markers.M2 = x + BAG.markers.M2;
-BAG_mod.markers.M3 = x + BAG.markers.M3;
-BAG_mod.markers.M4 = x + BAG.markers.M4;
-BAG_mod.markers.M5 = x + BAG.markers.M5;
-BAG_mod.markers.M6 = x + BAG.markers.M6;
-
 % Get the DCM corresponding to the rotation angles
 Q = euler_to_DCM(roll, pitch, yaw);
 
@@ -41,6 +32,15 @@ BAG_mod.markers.M3 = Q * BAG_mod.markers.M3;
 BAG_mod.markers.M4 = Q * BAG_mod.markers.M4;
 BAG_mod.markers.M5 = Q * BAG_mod.markers.M5;
 BAG_mod.markers.M6 = Q * BAG_mod.markers.M6;
+
+% Shift the marker positions
+BAG_mod.x = x;
+BAG_mod.markers.M1 = x + BAG_mod.markers.M1;
+BAG_mod.markers.M2 = x + BAG_mod.markers.M2;
+BAG_mod.markers.M3 = x + BAG_mod.markers.M3;
+BAG_mod.markers.M4 = x + BAG_mod.markers.M4;
+BAG_mod.markers.M5 = x + BAG_mod.markers.M5;
+BAG_mod.markers.M6 = x + BAG_mod.markers.M6;
 
 end
 

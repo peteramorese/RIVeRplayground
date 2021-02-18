@@ -37,8 +37,8 @@ for k = 1:num_points
         
         y_k_MID = get_yhat(BAG.markers.(MID_str), R, CORE, SENSORS, SID, 1);
         
-        if ~isempty(y_k_MID)
-            y_k(:, i) = [y_k_MID; i; SID];
+        if ~isnan(y_k_MID(1))
+            y_k(:, i) = [y_k_MID; MID(i); SID];
         end
         
     end
