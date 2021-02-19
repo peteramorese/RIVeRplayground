@@ -7,7 +7,7 @@
 %% Initialization
 
 % Housekeeping
-clear; close all; clc;
+clear; clc; %close all; 
 
 % Coordinate Frame Definitions
 RIVeR_Coord_Def;
@@ -118,14 +118,15 @@ for i = 1:CONSTANTS.m
     plot3(x, y, z, 'ro', 'LineWidth', 2);
     text(1.1*x, 1.1*y, 1.1*z, s_str);
     
-    if i == 4 || i == 5
-        plot_FOV(SENSORS_true.(s_str).pos, SENSORS_true.(s_str).Q_C, SENSORS_true.constants.gamma, SENSORS_true.constants.theta, vis_axes);
-    end
+%     if i == 4 || i == 5
+%         plot_FOV(SENSORS_true.(s_str).pos, SENSORS_true.(s_str).Q_C, SENSORS_true.constants.gamma, SENSORS_true.constants.theta, vis_axes);
+%     end
 %     plot_FOV(SENSORS_true.(s_str).pos, SENSORS_true.(s_str).Q_C, SENSORS_true.constants.gamma, SENSORS_true.constants.theta, vis_axes);
     
 end
 
 plot_core(vis_axes);
+ylim([-3 3])
 
 MID_mat = zeros(6, CONSTANTS.m);
 
@@ -152,17 +153,34 @@ for i = 1:CONSTANTS.m
     end
 end
 
-MID_mat(1:3, 10) = zeros(3, 1);
+% for sid = 1:CONSTANTS.m
+% 
+%     Y_cal = get_sim_data(sid, find(MID_mat(:, sid)), t, R, CORE, BAG1, SENSORS_true);
+%     
+%     filename = sprintf('Y_cal%d.txt', sid);
+%     
+%     write_sim_data(filename, Y_cal);
+%     
+% end
 
-for sid = 1:CONSTANTS.m
-
-    Y_cal = get_sim_data(sid, find(MID_mat(:, sid)), t, R, CORE, BAG1, SENSORS_true);
-    
-    filename = sprintf('Y_cal%d.txt', sid);
-    
-    write_sim_data(filename, Y_cal);
-    
+%%
+S_positions = zeros(10, 3);
+for i = 1:10
+    s_str = sprintf('S%d', i);
+    S_positions(i, :) = SENSORS_true.(s_str).pos;
 end
+
+S_positions = S_positions .* 39.3701;
+
+fprintf('\t\t X [in] \t\t Y [in] \t\t Z [in]\n')
+fprintf('----------------------------------------------------\n')
+
+for i = 1:10
+    s_str = sprintf('S%d', i);
+    pos = SENSORS_true.(s_str).pos;
+    fprintf('S%d\t\t %.4f \t\t %.4f \t\t %.4f\n', i, pos(1), pos(2), pos(3))
+end
+
 
 %% Estimation
 

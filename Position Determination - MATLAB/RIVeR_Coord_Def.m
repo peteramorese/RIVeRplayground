@@ -47,7 +47,7 @@ clear s2_C
 
 %% Sensor 3 Frame (defined in the Core Frame)
 % s3_C = [0.56; 0.52; 0.6] + [-0.0235; 0.1107; -0.1603]; % Position of Sensor 3 (defined in the C Frame)
-s3_C = [0.5621; 0.7242; -0.9479];
+s3_C = [.75; 0.7242; 0.9479];
 
 SENSORS_true.S3.pos = s3_C; % Position of Sensor 3 (defined in the C Frame)
 SENSORS_true.S3.point = CORE.origin; % Reference point centered in the sensor's FOV
@@ -57,7 +57,7 @@ SENSORS_true.S3.Q_C = CORE.frame*SENSORS_true.S3.frame; % Direction Cosine Matri
 clear s3_C
 
 %% Sensor 4 Frame (defined in the Core Frame)
-s4_C = [0.5621; -0.7242; -0.9479];
+s4_C = [.75; -0.7242; 0.9479];
 
 SENSORS_true.S4.pos = s4_C; % Position of Sensor 3 (defined in the C Frame)
 SENSORS_true.S4.point = CORE.origin; % Reference point centered in the sensor's FOV
@@ -66,7 +66,7 @@ SENSORS_true.S4.Q_C = CORE.frame*SENSORS_true.S4.frame; % Direction Cosine Matri
 
 
 %% Sensor 5 Frame (defined in the Core Frame)
-s5_C = [0.3312; 0; 1.1934];
+s5_C = [1.000; 0; 1.1934];
 
 SENSORS_true.S5.pos = s5_C; % Position of Sensor 3 (defined in the C Frame)
 SENSORS_true.S5.point = CORE.origin; % Reference point centered in the sensor's FOV
@@ -75,7 +75,7 @@ SENSORS_true.S5.Q_C = CORE.frame*SENSORS_true.S5.frame; % Direction Cosine Matri
 
 
 %% Sensor 6 Frame (defined in the Core Frame)
-s6_C = [1.9274; 1.1662; -0.2541];
+s6_C = [1.772; 1.0353; 0.5978];
 
 SENSORS_true.S6.pos = s6_C; % Position of Sensor 3 (defined in the C Frame)
 SENSORS_true.S6.point = CORE.drop; % Reference point centered in the sensor's FOV
@@ -83,7 +83,7 @@ SENSORS_true.S6.frame = get_sensor_frame(s6_C, SENSORS_true.S6.point, CORE);  % 
 SENSORS_true.S6.Q_C = CORE.frame*SENSORS_true.S6.frame; % Direction Cosine Matrix: S2 Frame --> C Frame
 
 %% Sensor 7 Frame (defined in the Core Frame)
-s7_C = [1.9274; 0.2541; -1.1662];
+s7_C = [2.772; 1.0353; 0.5978];
 
 SENSORS_true.S7.pos = s7_C; % Position of Sensor 3 (defined in the C Frame)
 SENSORS_true.S7.point = CORE.drop; % Reference point centered in the sensor's FOV
@@ -91,7 +91,7 @@ SENSORS_true.S7.frame = get_sensor_frame(s7_C, SENSORS_true.S7.point, CORE);  % 
 SENSORS_true.S7.Q_C = CORE.frame*SENSORS_true.S7.frame; % Direction Cosine Matrix: S2 Frame --> C Frame
 
 %% Sensor 8 Frame (defined in the Core Frame)
-s8_C = [3.0564; 1.1304; 0.3848];
+s8_C = [1.2720; 0; 1.1955];
 
 SENSORS_true.S8.pos = s8_C; % Position of Sensor 3 (defined in the C Frame)
 SENSORS_true.S8.point = CORE.drop; % Reference point centered in the sensor's FOV
@@ -99,7 +99,7 @@ SENSORS_true.S8.frame = get_sensor_frame(s8_C, SENSORS_true.S8.point, CORE);  % 
 SENSORS_true.S8.Q_C = CORE.frame*SENSORS_true.S8.frame; % Direction Cosine Matrix: S2 Frame --> C Frame
 
 %% Sensor 9 Frame (defined in the Core Frame)
-s9_C = [3.0564; -0.3848; -1.1304];
+s9_C = [3.272; 0; 1.1955];
 
 SENSORS_true.S9.pos = s9_C; % Position of Sensor 3 (defined in the C Frame)
 SENSORS_true.S9.point = CORE.drop; % Reference point centered in the sensor's FOV
@@ -107,7 +107,7 @@ SENSORS_true.S9.frame = get_sensor_frame(s9_C, SENSORS_true.S9.point, CORE);  % 
 SENSORS_true.S9.Q_C = CORE.frame*SENSORS_true.S9.frame; % Direction Cosine Matrix: S2 Frame --> C Frame
 
 %% Sensor 10 Frame (defined in the Core Frame)
-s10_C = [4.6787; -0.8453; 0.8453];
+s10_C = [2.2720; -1.0353; 0.5978];
 
 SENSORS_true.S10.pos = s10_C; % Position of Sensor 3 (defined in the C Frame)
 SENSORS_true.S10.point = CORE.drop; % Reference point centered in the sensor's FOV

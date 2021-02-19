@@ -13,7 +13,7 @@ FOV_vec2 = R1(theta) * [0; 0; 1];
 FOV_vec3 = R2(-gamma) * [0; 0; 1];
 FOV_vec4 = R2(gamma) * [0; 0; 1];
 
-n = 8;
+n = 2;
 
 vec1 = [FOV_vec3(1); FOV_vec1(2); FOV_vec1(3)] .* ones(3, n);
 vec2 = [FOV_vec4(1); FOV_vec1(2); FOV_vec1(3)] .* ones(3, n);
