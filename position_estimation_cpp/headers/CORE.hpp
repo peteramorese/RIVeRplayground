@@ -10,6 +10,7 @@ struct CORE
 {
 	vec origin;
 	mat frame;
+	vec targ;
 
 	CORE()
 	{
@@ -18,6 +19,8 @@ struct CORE
 
 		frame.resize(3, 3);
 		frame = eye(3, 3);
+
+		targ = {2.2720, 0.8453, -0.8453};
 	};
 };
 

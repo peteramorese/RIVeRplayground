@@ -51,7 +51,7 @@ private:
 	mat get_sensor_frame(vec pos, vec pnt, CORE c);
 	void set_params();
 	EKF ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE c, CONSTANTS cnst);
-	std::tuple<double, double> get_yhat(MARKER m, CORE c, bool sim);
+	std::tuple<double, double> get_yhat(MARKER m, CORE c);
 	void set_position(vec pos);
 	mat get_H_tilde(MARKER m);
 	
