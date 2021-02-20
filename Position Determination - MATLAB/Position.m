@@ -153,15 +153,15 @@ for i = 1:CONSTANTS.m
     end
 end
 
-% for sid = 1:CONSTANTS.m
-% 
-%     Y_cal = get_sim_data(sid, find(MID_mat(:, sid)), t, R, CORE, BAG1, SENSORS_true);
-%     
-%     filename = sprintf('Y_cal%d.txt', sid);
-%     
-%     write_sim_data(filename, Y_cal);
-%     
-% end
+for sid = 1:CONSTANTS.m
+
+    Y_cal = get_sim_data(sid, find(MID_mat(:, sid)), t, R, CORE, BAG1, SENSORS_true);
+    
+    filename = sprintf('Y_cal%d.txt', sid-1);
+    
+    write_sim_data(filename, Y_cal);
+    
+end
 
 %%
 S_positions = zeros(10, 3);
