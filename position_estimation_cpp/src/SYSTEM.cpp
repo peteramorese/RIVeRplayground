@@ -160,7 +160,6 @@ std::vector<std::vector<DATA>> SYSTEM::read_data(string filename)
 	string str;
 	string substr;
 	int cnt;
-	// int i = 0;
 	DATA y_k;
 
 	vector<int> mids; // Vector containing the Marker IDs of measured markers at time k
