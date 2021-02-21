@@ -110,6 +110,7 @@ void SYSTEM::calibrate(BAG cal)
 		if(plot == true) // If the plot flag is set to true
 		{
 			sensors[i].plot_ekf(); // Plot the EKF results
+			// sensors[i].plot_e_y();
 		}
 
 		cout << "DONE" << endl;
@@ -131,8 +132,8 @@ void SYSTEM::get_data()
 
 	for(int i = 0; i < cnst.m; i++) // For each sensor in the network
 	{
-		filename = "../data/Y_sim_.txt";
-		filename[13] = to_string(i+1)[0]; // Set the SID in the filename
+		filename = "../data/Y_cal_.txt";
+		filename[13] = to_string(i)[0]; // Set the SID in the filename
 
 		Y_sid = read_data(filename); // Read the data file
 		Y.push_back(Y_sid); // Add the data vector to the multidimensional data vector
@@ -190,7 +191,7 @@ std::vector<std::vector<DATA>> SYSTEM::read_data(string filename)
 			}
 			else if(cnt == 3) // Marker ID mid
 			{
-				y_k.mid = stoi(substr) - 1;
+				y_k.mid = stoi(substr);
 
 				// This next part of the function determines how many times each marker has been measured at time k
 				// If this measurement is the first measurement of marker mid, continue adding data for time k
@@ -226,7 +227,7 @@ std::vector<std::vector<DATA>> SYSTEM::read_data(string filename)
 			}
 			else if(cnt == 4) // Sensor ID sid
 			{
-				y_k.sid = stoi(substr) - 1;
+				y_k.sid = stoi(substr);
 			}
 		}
 

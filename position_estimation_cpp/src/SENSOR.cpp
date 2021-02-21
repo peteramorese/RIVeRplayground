@@ -58,99 +58,102 @@ void SENSOR::init_default_sensor(int id, CORE c)
 
 	if(id == 0) // Sensor 0
 	{
-		position = {0.5, -0.55, -0.98};
+		position = {0.4142, 1.1214, 0.4052};
 		point = {0, 0, 0};
 		if(sim == true)
 		{
-			position_true = {0.5888, -0.3422, -0.9577};
+			position_true = {0.5030, 1.3292, 0.4275};
 		}
 	}
 	else if(id == 1) // Sensor 1
 	{
-		position = {0.56, 0.52, -0.6};
+		position = {0.4142, -1.1214, 0.4052};
 		point = {0, 0, 0};
 		if(sim == true)
 		{
-			position_true = {0.5230, 0.5525, -0.4486};
+			position_true = {0.3772, -1.0889, 0.5566};
 		}
 	}
 	else if(id == 2) // Sensor 2
 	{
-		position = {0.56, 0.52, 0.6};
+		position = {0.75, 0.7242, 0.9479};
 		point = {0, 0, 0};
 		if(sim == true)
 		{
-			position_true = {0.5365, 0.6307, 0.4397};
+			position_true = {0.7265, 0.8349, 0.7876};
 		}
 	}
 	else if(id == 3) // Sensor 3
 	{
-		position = {0.50, -0.55, 0.98};
+		position = {0.75, -0.7242, 0.9479};
 		point = {0, 0, 0};
 		if(sim == true)
 		{
-			position_true = position;
-			// position_true = {0.5365, 0.6307, 0.4397};
+			position_true = {0.8038, -0.5408, 0.7220};
 		}
 	}
 	else if(id == 4) // Sensor 4
 	{
-		position = {2.23, -1.16, 0.61};
+		position = {1.00, 0.00, 1.1934};
 		point = {0, 0, 0};
 		if(sim == true)
 		{
-			position_true = position;
-			// position_true = {0.5365, 0.6307, 0.4397};
+			position_true = {1.0862, 0.0319, 1.0626};
 		}
 	}
 	else if(id == 5) // Sensor 5
 	{
-		position = {3.21, -0.54, 0.98};
+		position = {1.772, 1.0353, 0.5978};
+		// point = {2.2720, 0.8453, -0.8453};
 		point = {0, 0, 0};
 		if(sim == true)
 		{
-			position_true = position;
-			// position_true = {0.5365, 0.6307, 0.4397};
+			position_true = {1.7286, 1.0696, 0.9556};
+			position_true = position_true - c.targ;
 		}
 	}
 	else if(id == 6) // Sensor 6
 	{
-		position = {3.80, -0.22, 0.0};
+		position = {2.772, 1.0353, 0.5978};
+		// point = {2.2720, 0.8453, -0.8453};
 		point = {0, 0, 0};
 		if(sim == true)
 		{
-			position_true = position;
-			// position_true = {0.5365, 0.6307, 0.4397};
+			position_true = {3.0489, 0.9003, 0.9013};
+			position_true = position_true - c.targ;
 		}
 	}
 	else if(id == 7) // Sensor 7
 	{
-		position = {3.19, -0.54, 0.99};
+		position = {1.272, 0.00, 1.1955};
+		// point = {2.2720, 0.8453, -0.8453};
 		point = {0, 0, 0};
 		if(sim == true)
 		{
-			position_true = position;
-			// position_true = {0.5365, 0.6307, 0.4397};
+			position_true = {1.3445, -0.0063, 1.267};
+			position_true = position_true - c.targ;
 		}
 	}
 	else if(id == 8) // Sensor 8
 	{
-		position = {2.22, -1.16, -0.60};
+		position = {3.272, 0.00, 1.1955};
+		// point = {2.2720, 0.8453, -0.8453};
 		point = {0, 0, 0};
 		if(sim == true)
 		{
-			position_true = position;
-			// position_true = {0.5365, 0.6307, 0.4397};
+			position_true = {3.2515, -0.0124, 1.3445};
+			position_true = position_true - c.targ;
 		}
 	}
 	else if(id == 9) // Sensor 9
 	{
-		position = {};
+		position = {2.272, -1.0353, 0.5978};
+		// point = {2.2720, 0.8453, -0.8453};
 		point = {0, 0, 0};
 		if(sim == true)
 		{
-			position_true = position;
-			// position_true = {0.5365, 0.6307, 0.4397};
+			position_true = {2.4129, -0.8936, 0.6649};
+			position_true = position_true - c.targ;
 		}
 	}
 
@@ -233,10 +236,16 @@ void SENSOR::calibrate_sensor(std::vector<std::vector<DATA>> Y, BAG bag, CORE co
 	for(int k = 0; k < Y.size(); k++) // For each time k
 	{
 		y_k = Y[k]; // Measurement of all markers at time k
-
+		
 		e = ekf_update(ekf[ekf.size()-1], bag, y_k, core, cnst); // Get next EKF update
 
 		ekf.push_back(e); // Add EKF update to the sensor
+
+		if((sid == 5 || sid == 1) && k == 500)
+		{
+			double hi;
+			cin >> hi;
+		}
 	}
 }
 
@@ -278,15 +287,12 @@ EKF SENSOR::ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE core, CONSTAN
 
 		for(int i = 0; i < num_meas; i++)
 		{
-
-			// cout << "Marker " << bag.markers[mid_valid[i]].position << endl;
-			yhat_tup = get_yhat(bag.markers[mid_valid[i]], core, false); // Get predicted measurement
-
+			yhat_tup = get_yhat(bag.markers[mid_valid[i]], core); // Get predicted measurement
 			yhat[2*i] = std::get<0>(yhat_tup); // Store yhat in a stacked vector
 			yhat[2*i+1] = std::get<1>(yhat_tup);
 
-			y[2*i] = y_k[mid_valid[i]].x; // Store real measurements in a stacked vector
-			y[2*i+1] = y_k[mid_valid[i]].y;
+			y[2*i] = y_k[i].x; // Store real measurements in a stacked vector
+			y[2*i+1] = y_k[i].y;
 
 			mat H = get_H_tilde(bag.markers[mid_valid[i]]); 
 			H_tilde = std::move(arma::join_cols(H_tilde, H));
@@ -300,6 +306,11 @@ EKF SENSOR::ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE core, CONSTAN
 
 		// Kalman gain matrix
 		mat K_tilde = e.P * H_tilde.t() * (H_tilde * e.P * H_tilde.t() + R_blk).i();
+
+		if(sid == 5 || sid == 1)
+		{
+			cout << "H = \n" << H_tilde << endl;
+		}
 		
 		e_kp1.x_hat = e.x_hat + K_tilde * e_kp1.e_y; // New state estimate
 
@@ -328,7 +339,7 @@ EKF SENSOR::ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE core, CONSTAN
 }
 
 
-std::tuple<double, double> SENSOR::get_yhat(MARKER m, CORE c, bool sim = false)
+std::tuple<double, double> SENSOR::get_yhat(MARKER m, CORE c)
 {
 	// The nonlinear measurement function for yhat
 	//
@@ -339,7 +350,6 @@ std::tuple<double, double> SENSOR::get_yhat(MARKER m, CORE c, bool sim = false)
 	//
 	// Outputs:
 	//		tuple yhat - Pixy output [x, y]
-
 
 	mat C = c.frame; // Core Frame matrix
 
@@ -359,15 +369,7 @@ std::tuple<double, double> SENSOR::get_yhat(MARKER m, CORE c, bool sim = false)
 
 	vec pos; // Position vector to calculate with
 
-	// Nonlinear measurement function
-	if(sim == true) // Use true position
-	{
-		pos = position_true;
-	}
-	else // Use estimated position
-	{
-		pos = position;
-	}
+	pos = position;
 
 	vec V_S = frame.t() * C.t() * (m.position - pos);
 	double a = V_S[2];
@@ -379,169 +381,10 @@ std::tuple<double, double> SENSOR::get_yhat(MARKER m, CORE c, bool sim = false)
 
 	std::tuple<double, double> yhat;
 
-	if(sim == true) // If sim flag to corrupt with measurement noise is set to true
-	{
-		arma_rng::set_seed_random();
-		vec mu = {0, 0};
-		mat N = mvnrnd(mu, R); // Generate measurement noise
-
-		yhat_vec = yhat_vec + N; // Corrupt measurements with noise
-	}
-
-	if(sim == true) // If sim flag to round measurements is set to true
-	{
-		yhat_vec = round(yhat_vec); // Round the measurements to the nearest int
-	}
-
 	std::get<0>(yhat) = yhat_vec[0]; // Assign measurements to a tuple
 	std::get<1>(yhat) = yhat_vec[1];
 
-	if(sim == true) // If sim flag to account for visibility is set to true
-	{
-		// If marker is outside the visibility of the sensor
-		if(std::get<0>(yhat) > x_max || std::get<0>(yhat) < 0 || std::get<1>(yhat) > y_max || std::get<1>(yhat) < 0)
-		{
-			std::get<0>(yhat) = NAN; // Return NAN
-			std::get<1>(yhat) = NAN;
-		}
-	}
-
 	return yhat;
-}
-
-
-mat SENSOR::get_H_tilde(MARKER m)
-{
-	// Function to find the H_tilde matrix for calibration of the sensor positioning system
-	// Jacobian was computed symbolically in Mathematica and hand-typed here
-	// Results were compared between this and the Mathematica output
-	// 
-	// Inputs:
-	// 		MARKER m - Object containing the position of the marker being measured
-	// 
-	// Outputs:
-	// 		mat H - H_tilde matrix used in calibration, equal to dh/ds
-	// 
-
-	// cout << "x = \n" << position << endl;
-	// cout << "m = \n" << m.position << endl;
-
-	double gamma_rad = gamma * M_PI / 180.0; // [rad] Horizontal FOV half-angle
-	double theta_rad = theta * M_PI / 180.0; // [rad] Vertical FOV half-angle
-
-	mat T = {{tan(gamma_rad), 0, 0},
-			{0, tan(theta_rad), 0},
-			{0, 0, 1}};
-
-	mat DELTA = {{2.0/x_max, 0},
-			{0, 2.0/y_max},
-			{0, 0}};
-
-	double s1 = position[0];
-	double s2 = position[1];
-	double s3 = position[2];
-
-	double x1 = m.position[0];
-	double x2 = m.position[1];
-	double x3 = m.position[2];
-
-	// The H_tilde_partial matrix was computed symbolically in Mathematica, and hand-typed here
-	mat H_tilde_partial(3, 3, arma::fill::zeros);
-
-	double s_mag = sqrt(pow(s1, 2.0) + pow(s2, 2.0) + pow(s3, 2.0)); // Magnitude of the vector s
-	double s_denom = sqrt(pow(s1, 2.0)/pow(s_mag, 2.0) + pow(s2, 2.0)/pow(s_mag, 2)); // Common denominator term in the Jacobian
-
-	H_tilde_partial(0, 0) = -(((-s2*x1/(s_mag*s_denom) + s1*x2/(s_mag*s_denom))*(s1/s_mag + pow(s1, 2.0)*(x1-s1)/pow(s_mag, 3.0) - 
-		(x1-s1)/s_mag + s1*s2*(x2-s2)/pow(s_mag, 3.0) + s1*s3*(x3-s3)/pow(s_mag, 3.0)))/pow((-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - 
-		s3*(x3-s3)/s_mag), 2.0)) + (s2*(-2*pow(s1, 3.0)/pow(s_mag, 4.0) - 2*s1*pow(s2, 2.0)/pow(s_mag, 4.0) + 
-		2*s1/pow(s_mag, 2.0))*x1/(2*s_mag*pow(s_denom, 3.0)) + s1*s2*x1/(pow(s_mag, 3.0)*s_denom) - s1*(-2*pow(s1, 3.0)/pow(s_mag, 4.0) - 
-		2*s1*pow(s2, 2.0)/pow(s_mag, 4.0) + 2*s1/pow(s_mag, 2))*x2/(2*s_mag*pow(s_denom, 3.0)) - pow(s1, 2.0)*x2/(pow(s_mag, 3.0)*s_denom) + 
-		x2/(s_mag*s_denom))/(-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag);
-
-	H_tilde_partial(0, 1) = -(((-s2*x1/(s_mag*s_denom) + s1*x2/(s_mag*s_denom))*(s2/s_mag + s1*s2*(x1-s1)/(pow(s_mag, 3.0)) + 
-		pow(s2, 2.0)*(x2-s2)/pow(s_mag, 3.0) - (x2-s2)/s_mag + s2*s3*(x3-s3)/pow(s_mag, 3.0)))/pow((-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - 
-		s3*(x3-s3)/s_mag), 2.0)) + (s2*(-2*pow(s1, 2.0)*s2/pow(s_mag, 4.0) - 2*pow(s2, 3.0)/pow(s_mag, 4.0) + 
-		2*s2/pow(s_mag, 2.0))*x1/(2*s_mag*pow(s_denom, 3.0)) + pow(s2, 2.0)*x1/(pow(s_mag, 3.0)*s_denom) - x1/(s_mag*s_denom) - 
-		s1*(-2*pow(s1, 2.0)*s2/pow(s_mag, 4.0) - 2*pow(s2, 3.0)/pow(s_mag, 4.0) + 2*s2/pow(s_mag, 2.0))*x2/(2*s_mag*pow(s_denom, 3.0)) - 
-		s1*s2*x2/(pow(s_mag, 3.0)*s_denom))/(-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag);
-
-	H_tilde_partial(0, 2) = -(((-s2*x1/(s_mag*s_denom) + s1*x2/(s_mag*s_denom))*(s3/s_mag + s1*s3*(x1-s1)/(pow(s_mag, 3.0)) + 
-		s2*s3*(x2-s2)/pow(s_mag, 3.0) + pow(s3, 2.0)*(x3-s3)/pow(s_mag, 3.0) - (x3-s3)/s_mag))/pow((-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - 
-		s3*(x3-s3)/s_mag), 2.0)) + (s2*(-2*pow(s1, 2.0)*s3/pow(s_mag, 4.0) - 2*pow(s2, .0)*s3/pow(s_mag, 4.0))*x1/(2*s_mag*pow(s_denom, 3.0)) + 
-		s2*s3*x1/(pow(s_mag, 3.0)*s_denom) - s1*(-2*pow(s1, 2.0)*s3/pow(s_mag, 4.0) - 2*pow(s2, 2.0)*s3/pow(s_mag, 4.0))*x2/(2*s_mag*pow(s_denom, 3.0)) - 
-		s1*s3*x2/(pow(s_mag, 3.0)*s_denom))/(-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag);
-
-	H_tilde_partial(1, 0) = -(((-pow(s1, 2.0)*s3/(pow(s_mag, 2.0)*s_denom) - pow(s2, 2.0)*s3/(pow(s_mag, 2.0)*s_denom) - 
-		s3*(-pow(s1, 2.0)/(pow(s_mag, 2.0)*s_denom) - pow(s2, 2.0)/(pow(s_mag, 2.0)*s_denom)) + s1*s3*x1/(pow(s_mag, 2.0)*s_denom) + 
-		s2*s3*x2/(pow(s_mag, 2.0)*s_denom) + (-pow(s1, 2.0)/(pow(s_mag, 2.0)*s_denom) - pow(s2, 2.0)/(pow(s_mag, 2.0)*s_denom))*x3)*(s1/s_mag + 
-		pow(s1, 2.0)*(x1-s1)/pow(s_mag, 3.0) - (x1-s1)/s_mag + s1*s2*(x2-s2)/pow(s_mag, 3.0) + s1*s3*(x3-s3)/pow(s_mag, 3.0)))/pow((-s1*(x1-s1)/s_mag - 
-		s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag), 2.0)) + (pow(s1, 2.0)*s3*(-2*pow(s1, 3.0)/pow(s_mag, 4.0) - 2*s1*pow(s2, 2.0)/pow(s_mag, 4.0) + 
-		2*s1/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + pow(s2, 2.0)*s3*(-2*pow(s1, 3.0)/pow(s_mag, 4.0) - 2*s1*pow(s2, 2.0)/pow(s_mag, 4.0) + 
-		2*s1/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + 2*pow(s1, 3.0)*s3/(pow(s_mag, 4.0)*s_denom) + 2*s1*pow(s2, 2.0)*s3/(pow(s_mag, 4.0)*s_denom) - 
-		2*s1*s3/(pow(s_mag, 2.0)*s_denom) - s3*(pow(s1, 2.0)*(-2*pow(s1, 3.0)/pow(s_mag, 4.0) - 2*s1*pow(s2, 2.0)/pow(s_mag, 4.0) + 
-		2*s1/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + pow(s2, 2.0)*(-2*pow(s1, 3.0)/pow(s_mag, 4.0) - 2*s1*pow(s2, 2.0)/pow(s_mag, 4.0) + 
-		2*s1/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + 2*pow(s1, 3.0)/(pow(s_mag, 4.0)*s_denom) + 2*s1*pow(s2, 2.0)/(pow(s_mag, 4.0)*s_denom) - 
-		2*s1/(pow(s_mag, 2.0)*s_denom)) - s1*s3*(-2*pow(s1, 3.0)/pow(s_mag, 4.0) - 2*s1*pow(s2, 2.0)/pow(s_mag, 4.0) + 
-		2*s1/pow(s_mag, 2.0))*x1/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) - 2*pow(s1, 2.0)*s3*x1/(pow(s_mag, 4.0)*s_denom) + s3*x1/(pow(s_mag, 2.0)*s_denom) - 
-		s2*s3*(-2*pow(s1, 3.0)/pow(s_mag, 4.0) - 2*s1*pow(s2, 2.0)/pow(s_mag, 4.0) + 2*s1/pow(s_mag, 2.0))*x2/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) - 
-		2*s1*s2*s3*x2/(pow(s_mag, 4.0)*s_denom) + (pow(s1, 2.0)*(-2*pow(s1, 3.0)/pow(s_mag, 4.0) - 2*s1*pow(s2, 2.0)/pow(s_mag, 4.0) + 
-		2*s1/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + pow(s2, 2.0)*(-2*pow(s1, 3.0)/pow(s_mag, 4.0) - 2*s1*pow(s2, 2.0)/pow(s_mag, 4.0) + 
-		2*s1/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + 2*pow(s1, 3.0)/(pow(s_mag, 4.0)*s_denom) + 2*s1*pow(s2, 2.0)/(pow(s_mag, 4.0)*s_denom) - 
-		2*s1/(pow(s_mag, 2.0)*s_denom))*x3)/(-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag);
-
-	H_tilde_partial(1, 1) = -(((-pow(s1, 2.0)*s3/(pow(s_mag, 2.0)*s_denom) - pow(s2, 2.0)*s3/(pow(s_mag, 2.0)*s_denom) - s3*(-pow(s1, 2.0)/(pow(s_mag, 2.0)*s_denom) - 
-		pow(s2, 2.0)/(pow(s_mag, 2.0)*s_denom)) + s1*s3*x1/(pow(s_mag, 2.0)*s_denom) + s2*s3*x2/(pow(s_mag, 2.0)*s_denom) + (-pow(s1, 2.0)/(pow(s_mag, 2.0)*s_denom) - 
-		pow(s2, 2.0)/(pow(s_mag, 2.0)*s_denom))*x3)*(s2/s_mag + s1*s2*(x1-s1)/pow(s_mag, 3.0) + pow(s2, 2.0)*(x2-s2)/pow(s_mag, 3.0) - (x2-s2)/s_mag +  
-		s2*s3*(x3-s3)/pow(s_mag, 3.0)))/pow((-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag), 2.0)) + (pow(s1, 2.0)*s3*(-2*pow(s1, 2.0)*s2/pow(s_mag, 4.0) - 
-		2*pow(s2, 3.0)/pow(s_mag, 4.0) + 2*s2/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + pow(s2, 2.0)*s3*(-2*pow(s1, 2.0)*s2/pow(s_mag, 4.0) - 
-		2*pow(s2, 3.0)/pow(s_mag, 4.0) + 2*s2/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + 2*pow(s1, 2.0)*s2*s3/(pow(s_mag, 4.0)*s_denom) + 
-		2*pow(s2, 3.0)*s3/(pow(s_mag, 4.0)*s_denom) - 2*s2*s3/(pow(s_mag, 2.0)*s_denom) - s3*(pow(s1, 2.0)*(-2*pow(s1, 2.0)*s2/pow(s_mag, 4.0) - 
-		2*pow(s2, 3.0)/pow(s_mag, 4.0) + 2*s2/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + pow(s2, 2.0)*(-2*pow(s1, 2.0)*s2/pow(s_mag, 4.0) - 
-		2*pow(s2, 3.0)/pow(s_mag, 4.0) + 2*s2/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + 2*pow(s1, 2.0)*s2/(pow(s_mag, 4.0)*s_denom) + 
-		2*pow(s2, 3.0)/(pow(s_mag, 4.0)*s_denom) - 2*s2/(pow(s_mag, 2.0)*s_denom)) - s1*s3*(-2*pow(s1, 2.0)*s2/pow(s_mag, 4.0) - 2*pow(s2, 3.0)/pow(s_mag, 4.0) + 
-		2*s2/pow(s_mag, 2.0))*x1/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) - 2*s1*s2*s3*x1/(pow(s_mag, 4.0)*s_denom) - s2*s3*(-2*pow(s1, 2.0)*s2/pow(s_mag, 4.0) - 
-		2*pow(s2, 3.0)/pow(s_mag, 4.0) + 2*s2/pow(s_mag, 2.0))*x2/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) - 2*pow(s2, 2.0)*s3*x2/(pow(s_mag, 4.0)*s_denom) + 
-		s3*x2/(pow(s_mag, 2.0)*s_denom) + (pow(s1, 2.0)*(-2*pow(s1, 2.0)*s2/pow(s_mag, 4.0) - 2*pow(s2, 3.0)/pow(s_mag, 4.0) + 
-		2*s2/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + pow(s2, 2.0)*(-2*pow(s1, 2.0)*s2/pow(s_mag, 4.0) - 2*pow(s2, 3.0)/pow(s_mag, 4.0) + 
-		2*s2/pow(s_mag, 2.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + 2*pow(s1, 2.0)*s2/(pow(s_mag, 4.0)*s_denom) + 2*pow(s2, 3.0)/(pow(s_mag, 4.0)*s_denom) - 
-		2*s2/(pow(s_mag, 2.0)*s_denom))*x3)/(-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag);
-
-	H_tilde_partial(1, 2) = -(((-pow(s1, 2.0)*s3/(pow(s_mag, 2.0)*s_denom) - pow(s2, 2.0)*s3/(pow(s_mag, 2.0)*s_denom) - s3*(-pow(s1, 2.0)/(pow(s_mag, 2.0)*s_denom) - 
-		pow(s2, 2.0)/(pow(s_mag, 2.0)*s_denom)) + s1*s3*x1/(pow(s_mag, 2.0)*s_denom) + s2*s3*x2/(pow(s_mag, 2.0)*s_denom) + (-pow(s1, 2.0)/(pow(s_mag, 2.0)*s_denom) - 
-		pow(s2, 2.0)/(pow(s_mag, 2.0)*s_denom))*x3)*(s3/s_mag + s1*s3*(x1-s1)/pow(s_mag, 3.0) + s2*s3*(x2-s2)/pow(s_mag, 3.0) + pow(s3, 2.0)*(x3-s3)/pow(s_mag, 3.0) - 
-		(x3-s3)/s_mag))/pow((-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag), 2.0)) + (pow(s1, 2.0)*s3*(-2*pow(s1, 2.0)*s3/pow(s_mag, 4.0) - 
-		2*pow(s2, 2.0)*s3/pow(s_mag, 4.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + pow(s2, 2.0)*s3*(-2*pow(s1, 2.0)*s3/pow(s_mag, 4.0) - 
-		2*pow(s2, 2.0)*s3/pow(s_mag, 4.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + 2*pow(s1, 2.0)*pow(s3, 2.0)/(pow(s_mag, 4.0)*s_denom) + 
-		2*pow(s2, 2.0)*pow(s3, 2.0)/(pow(s_mag, 4.0)*s_denom) - s3*(pow(s1, 2.0)*(-2*pow(s1, 2.0)*s3/pow(s_mag, 4.0) - 
-		2*pow(s2, 2.0)*s3/pow(s_mag, 4.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + pow(s2, 2.0)*(-2*pow(s1, 2.0)*s3/pow(s_mag, 4.0) - 
-		2*pow(s2, 2.0)*s3/pow(s_mag, 4.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + 2*pow(s1, 2.0)*s3/(pow(s_mag, 4.0)*s_denom) + 
-		2*pow(s2, 2.0)*s3/(pow(s_mag, 4.0)*s_denom)) - s1*s3*(-2*pow(s1, 2.0)*s3/pow(s_mag, 4.0) - 2*pow(s2, 2.0)*s3/pow(s_mag, 4.0))*x1/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) - 
-		2*s1*pow(s3, 2.0)*x1/(pow(s_mag, 4.0)*s_denom) + s1*x1/(pow(s_mag, 2.0)*s_denom)- s2*s3*(-2*pow(s1, 2.0)*s3/pow(s_mag, 4.0) - 
-		2*pow(s2, 2.0)*s3/pow(s_mag, 4.0))*x2/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) - 2*s2*pow(s3, 2.0)*x2/(pow(s_mag, 4.0)*s_denom) + 
-		s2*x2/(pow(s_mag, 2.0)*s_denom) + (pow(s1, 2.0)*(-2*pow(s1, 2.0)*s3/pow(s_mag, 4.0) - 2*pow(s2, 2.0)*s3/pow(s_mag, 4.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + 
-		pow(s2, 2.0)*(-2*pow(s1, 2.0)*s3/pow(s_mag, 4.0) - 2*pow(s2, 2.0)*s3/pow(s_mag, 4.0))/(2*pow(s_mag, 2.0)*pow(s_denom, 3.0)) + 
-		2*pow(s1, 2.0)*s3/(pow(s_mag, 4.0)*s_denom) + 2*pow(s2, 2.0)*s3/(pow(s_mag, 4.0)*s_denom))*x3)/(-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag);
-
-	H_tilde_partial(2, 0) = -(((pow(s1, 2.0)/s_mag + pow(s2, 2.0)/s_mag + pow(s3, 2.0)/s_mag - s1*x1/s_mag - s2*x2/s_mag - s3*x3/s_mag)*(s1/s_mag + 
-		pow(s1, 2.0)*(x1-s1)/pow(s_mag, 3.0) - (x1-s1)/s_mag + s1*s2*(x2-s2)/pow(s_mag, 3.0) + s1*s3*(x3-s3)/pow(s_mag, 3.0)))/pow((-s1*(x1-s1)/s_mag - 
-		s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag), 2.0)) + (-pow(s1, 3.0)/pow(s_mag, 3.0) - s1*pow(s2, 2.0)/pow(s_mag, 3.0) - s1*pow(s3, 2.0)/pow(s_mag, 3.0) + 
-		2*s1/s_mag + pow(s1, 2.0)*x1/pow(s_mag, 3.0) - x1/s_mag + s1*s2*x2/pow(s_mag, 3.0) + s1*s3*x3/pow(s_mag, 3.0))/(-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag);
-
-	H_tilde_partial(2, 1) = -(((pow(s1, 2.0)/s_mag + pow(s2, 2.0)/s_mag + pow(s3, 2.0)/s_mag - s1*x1/s_mag - s2*x2/s_mag - s3*x3/s_mag)*(s2/s_mag + 
-		s1*s2*(x1-s1)/pow(s_mag, 3.0) + pow(s2, 2.0)*(x2-s2)/pow(s_mag, 3.0) - (x2-s2)/s_mag + s2*s3*(x3-s3)/pow(s_mag, 3.0)))/pow((-s1*(x1-s1)/s_mag - 
-		s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag), 2)) + (-pow(s1, 2.0)*s2/pow(s_mag, 3.0) - pow(s2, 3.0)/pow(s_mag, 3.0) - s2*pow(s3, 2.0)/pow(s_mag, 3.0) + 
-		2*s2/s_mag + s1*s2*x1/pow(s_mag, 3.0) + pow(s2, 2.0)*x2/pow(s_mag, 3.0) - x2/s_mag + s2*s3*x3/pow(s_mag, 3.0))/(-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag);
-
-	H_tilde_partial(2, 2) = -(((pow(s1, 2.0)/s_mag + pow(s2, 2.0)/s_mag + pow(s3, 2.0)/s_mag - s1*x1/s_mag - s2*x2/s_mag - s3*x3/s_mag)*(s3/s_mag + 
-		s1*s3*(x1-s1)/pow(s_mag, 3.0) + s2*s3*(x2-s2)/pow(s_mag, 3.0) + pow(s3, 2.0)*(x3-s3)/pow(s_mag, 3.0) - (x3-s3)/s_mag))/pow((-s1*(x1-s1)/s_mag - 
-		s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag), 2.0)) + (-pow(s1, 2.0)*s3/pow(s_mag, 3.0) - pow(s2, 2.0)*s3/pow(s_mag, 3.0) - pow(s3, 3.0)/pow(s_mag, 3.0) + 
-		2*s3/s_mag + s1*s3*x1/pow(s_mag, 3.0) + s2*s3*x2/pow(s_mag, 3.0) + pow(s3, 2.0)*x3/pow(s_mag, 3.0) - x3/s_mag)/(-s1*(x1-s1)/s_mag - s2*(x2-s2)/s_mag - s3*(x3-s3)/s_mag);
-
-	// cout << "H_tilde_partial = \n" << H_tilde_partial << endl;
-
-	mat H_tilde = (DELTA.t() * DELTA).i() * DELTA.t() * T.i() * H_tilde_partial; // dh/ds
-
-	return H_tilde;
 }
 
 
@@ -627,7 +470,7 @@ void SENSOR::plot_ekf()
 		}
 		else
 		{
-			plt::ylim(x.back() + 5*(nsigx.back() - x.back()), x.back() + 5*(sigx.back() - x.back()));
+			// plt::ylim(x.back() + 5*(nsigx.back() - x.back()), x.back() + 5*(sigx.back() - x.back()));
 		}
 		plt::legend();
 	plt::subplot(3, 1, 2);
@@ -649,7 +492,7 @@ void SENSOR::plot_ekf()
 		}
 		else
 		{
-			plt::ylim(y.back() + 5*(nsigy.back() - y.back()), y.back() + 5*(sigy.back() - y.back()));
+			// plt::ylim(y.back() + 5*(nsigy.back() - y.back()), y.back() + 5*(sigy.back() - y.back()));
 		}
 	plt::subplot(3, 1, 3);
 		if(sim == true)
@@ -671,7 +514,7 @@ void SENSOR::plot_ekf()
 		}
 		else
 		{
-			plt::ylim(z.back() + 5*(nsigz.back() - z.back()), z.back() + 5*(sigz.back() - z.back()));
+			// plt::ylim(z.back() + 5*(nsigz.back() - z.back()), z.back() + 5*(sigz.back() - z.back()));
 		}
 	plt::show();
 }
@@ -683,28 +526,1284 @@ void SENSOR::plot_e_y()
 
 	std::vector<double> x;
 	std::vector<double> y;
-	std::vector<double> z;
+	// std::vector<double> z;
 
 	std::vector<double> sigx;
 	std::vector<double> sigy;
-	std::vector<double> sigz;
+	// std::vector<double> sigz;
 
 	for(int i = 1; i < ekf.size(); i++)
 	{
 		x.push_back(ekf[i].e_y(0));
 		y.push_back(ekf[i].e_y(1));
-		z.push_back(ekf[i].e_y(2));
+		// z.push_back(ekf[i].e_y(2));
 	}
 
-	plt::figure(1);
+	std::stringstream ttl;
+	ttl << "Measurement Innovation vs Measurement Updates - Sensor " << sid << endl;
+
+	plt::figure();
+	plt::suptitle(ttl.str(), {{"fontsize", "20"}});
+	plt::subplot(2, 1, 1);
 	plt::plot(x, "b-");
-	plt::show();
+	plt::ylabel("X Measurement Innovation", {{"fontsize", "16"}});
 
-	plt::figure(2);
+	plt::subplot(2, 1, 2);
 	plt::plot(y, "b-");
+	plt::ylabel("Y Measurement Innovation", {{"fontsize", "16"}});
+	plt::xlabel("No. of Measurement Updates [k]", {{"fontsize", "16"}});
 	plt::show();
 
-	plt::figure(3);
-	plt::plot(z, "b-");
-	plt::show();
+	// plt::figure(3);
+	// plt::plot(z, "b-");
+	// plt::show();
+}
+
+
+mat SENSOR::get_H_tilde(MARKER m)
+{
+	// Function to find the H_tilde matrix for calibration of the sensor positioning system
+	// Jacobian was computed symbolically in Mathematica and converted to C code using the mathematica
+	// function 'CForm'
+	// Results were compared between this and the Mathematica output
+	// 
+	// Inputs:
+	// 		MARKER m - Object containing the position of the marker being measured
+	// 
+	// Outputs:
+	// 		mat H - H_tilde matrix used in calibration, equal to dh/ds
+	// 
+
+	// cout << "x = \n" << position << endl;
+	// cout << "m = \n" << m.position << endl;
+
+	double gamma_rad = gamma * M_PI / 180.0; // [rad] Horizontal FOV half-angle
+	double theta_rad = theta * M_PI / 180.0; // [rad] Vertical FOV half-angle
+
+	mat T = {{tan(gamma_rad), 0, 0},
+			{0, tan(theta_rad), 0},
+			{0, 0, 1}};
+
+	mat DELTA = {{2.0/x_max, 0},
+			{0, 2.0/y_max},
+			{0, 0}};
+
+	double s1 = position[0];
+	double s2 = position[1];
+	double s3 = position[2];
+
+	double p1 = point[0];
+	double p2 = point[1];
+	double p3 = point[2];
+
+	double x1 = m.position[0];
+	double x2 = m.position[1];
+	double x3 = m.position[2];
+
+	// The H_tilde_partial matrix was computed symbolically in Mathematica, and hand-typed here
+	mat H_tilde_partial(3, 3, arma::fill::zeros);
+
+	// double s_mag = sqrt(pow(s1, 2.0) + pow(s2, 2.0) + pow(s3, 2.0)); // Magnitude of the vector s
+	// double s_denom = sqrt(pow(s1, 2.0)/pow(s_mag, 2.0) + pow(s2, 2.0)/pow(s_mag, 2)); // Common denominator term in the Jacobian
+
+	H_tilde_partial(0, 0) = -(((-((s2*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+             sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+               pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) - 
+          (s1*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+           sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+             pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) + 
+          ((p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x1)/
+           sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+             pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) + 
+          ((-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x2)/
+           sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+             pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)))*
+        (-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) + 
+          (-(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+             1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) - 
+          ((p1 - s1)*s2*(-s2 + x2))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+          ((p1 - s1)*s3*(-s3 + x3))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+      pow((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+        (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+        (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3),2)) + 
+   (-((s2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+         sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) + 
+      (s2*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+              1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+           (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))/
+       sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+         pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) + 
+      (s1*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+              1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+           (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+      ((p1 - s1)*s1*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+      ((2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*
+            (-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+           (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x1)/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+      ((p1 - s1)*s2*x1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) + 
+      ((((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x2)/
+       sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+         pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+      ((2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*
+            (-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+           (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x2)/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)))/
+    ((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3));
+
+	H_tilde_partial(0, 1) = -(((-((s2*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+             sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+               pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) - 
+          (s1*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+           sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+             pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) + 
+          ((p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x1)/
+           sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+             pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) + 
+          ((-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x2)/
+           sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+             pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)))*
+        (-p2 + s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) - 
+          (s1*(p2 - s2)*(-s1 + x1))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+          (-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+             1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) - 
+          ((p2 - s2)*s3*(-s3 + x3))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+      pow((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+        (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+        (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3),2)) + 
+   (-((s1*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+             1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+         sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) - 
+      (-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))/
+       sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+         pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) + 
+      (s2*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+              1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+           (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+      (s1*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+              1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+           (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+      (s1*(p2 - s2)*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) + 
+      ((-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*
+         x1)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+         pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+      ((2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+              1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+           (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x1)/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+      ((2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+              1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+           (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x2)/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+      (s1*(p2 - s2)*x2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+    ((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3));
+
+	H_tilde_partial(0, 2) = ((s2*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*
+         ((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+           (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+      (s1*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*
+         ((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+           (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+      ((p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*
+         ((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+           (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*x1)/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+      (s2*(p3 - s3)*x1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+      ((-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*
+         ((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+           (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+            pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*x2)/
+       (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+      (s1*(p3 - s3)*x2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+    ((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3)) - 
+   ((-((s2*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+           sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+             pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) - 
+        (s1*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+         sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) + 
+        ((p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x1)/
+         sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) + 
+        ((-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x2)/
+         sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)))*
+      (-p3 + s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) - 
+        (s1*(p3 - s3)*(-s1 + x1))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+        (s2*(p3 - s3)*(-s2 + x2))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+        (-(1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - ((p3 - s3)*s3)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*
+         (-s3 + x3)))/pow((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3),2);
+
+	H_tilde_partial(1, 0) = -(((-((-(pow(p1,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                    pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) - 
+               pow(p2,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+               pow(s1,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                    pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+               pow(s2,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                    pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+               (2*p1*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                    pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))
+                  ) + (2*p2*s2)/
+                (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                    pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))
+                  ))*s3) - s1*((p1*p3)/
+              sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             (p3*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (s1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             (p1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            - s2*((p2*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             (p3*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (s2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             (p2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            + ((p1*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             (p3*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (s1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             (p1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            *x1 + ((p2*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             (p3*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (s2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             (p2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            *x2 + (-(pow(p1,2)/
+                sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) - 
+             pow(p2,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             pow(s1,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             pow(s2,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+             (2*p1*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (2*p2*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            *x3)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) + 
+          (-(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+             1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) - 
+          ((p1 - s1)*s2*(-s2 + x2))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+          ((p1 - s1)*s3*(-s3 + x3))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+      pow((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+        (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+        (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3),2)) + 
+   (-((p1*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) + 
+      (p3*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+      ((pow(p1,2)*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         (pow(p2,2)*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (2*(p1 - s1)*pow(s1,2))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (2*(p1 - s1)*pow(s2,2))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          + (2*p1*(p1 - s1)*s1)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + (2*p2*(p1 - s1)*s2)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (2*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (pow(s1,2)*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (pow(s2,2)*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (2*p1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         (p1*s1*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (p2*s2*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        *s3 - (s1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+      (p1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+      s1*(-(p1*p3*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                  1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+               (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (p3*(p1 - s1)*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - p3/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p3*s1*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*(p1 - s1)*s1*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p1*(p1 - s1)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + s3/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         (s1*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p1*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        - s2*(-(p2*p3*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                  1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+               (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (p3*(p1 - s1)*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + (p3*s2*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*(p1 - s1)*s2*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p2*(p1 - s1)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (s2*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p2*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        + (-(p1*p3*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                  1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+               (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (p3*(p1 - s1)*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - p3/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p3*s1*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*(p1 - s1)*s1*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p1*(p1 - s1)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + s3/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         (s1*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p1*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        *x1 + (-(p2*p3*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                  1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+               (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (p3*(p1 - s1)*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + (p3*s2*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*(p1 - s1)*s2*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p2*(p1 - s1)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (s2*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p2*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        *x2 + ((pow(p1,2)*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         (pow(p2,2)*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (2*(p1 - s1)*pow(s1,2))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (2*(p1 - s1)*pow(s2,2))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          + (2*p1*(p1 - s1)*s1)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + (2*p2*(p1 - s1)*s2)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (2*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (pow(s1,2)*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (pow(s2,2)*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (2*p1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         (p1*s1*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (p2*s2*(2*(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+              (2*(p1 - s1)*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        *x3)/((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3));
+
+	H_tilde_partial(1, 1) = -(((-((-(pow(p1,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                    pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) - 
+               pow(p2,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+               pow(s1,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                    pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+               pow(s2,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                    pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+               (2*p1*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                    pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))
+                  ) + (2*p2*s2)/
+                (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                    pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))
+                  ))*s3) - s1*((p1*p3)/
+              sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             (p3*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (s1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             (p1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            - s2*((p2*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             (p3*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (s2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             (p2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            + ((p1*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             (p3*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (s1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             (p1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            *x1 + ((p2*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             (p3*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (s2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             (p2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            *x2 + (-(pow(p1,2)/
+                sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) - 
+             pow(p2,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             pow(s1,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             pow(s2,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+             (2*p1*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (2*p2*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            *x3)*(-p2 + s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) - 
+          (s1*(p2 - s2)*(-s1 + x1))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+          (-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+             1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) - 
+          ((p2 - s2)*s3*(-s3 + x3))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+      pow((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+        (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+        (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3),2)) + 
+   (-((p2*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) + 
+      (p3*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+      ((pow(p1,2)*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         (pow(p2,2)*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (2*pow(s1,2)*(p2 - s2))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (2*(p2 - s2)*pow(s2,2))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          + (2*p1*s1*(p2 - s2))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + (2*p2*(p2 - s2)*s2)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (2*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (pow(s1,2)*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (pow(s2,2)*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (2*p2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         (p1*s1*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (p2*s2*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        *s3 - (s2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+      (p2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+      s1*(-(p1*p3*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                  1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+               (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (p3*s1*(p2 - s2))/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + (p3*s1*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*s1*(p2 - s2)*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p1*(p2 - s2)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (s1*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p1*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        - s2*(-(p2*p3*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                  1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+               (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (p3*(p2 - s2)*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - p3/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p3*s2*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*(p2 - s2)*s2*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p2*(p2 - s2)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + s3/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         (s2*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p2*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        + (-(p1*p3*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                  1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+               (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (p3*s1*(p2 - s2))/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + (p3*s1*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*s1*(p2 - s2)*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p1*(p2 - s2)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (s1*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p1*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        *x1 + (-(p2*p3*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                  1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+               (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (p3*(p2 - s2)*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - p3/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p3*s2*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*(p2 - s2)*s2*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p2*(p2 - s2)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + s3/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         (s2*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p2*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        *x2 + ((pow(p1,2)*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         (pow(p2,2)*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) - 
+         (2*pow(s1,2)*(p2 - s2))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (2*(p2 - s2)*pow(s2,2))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          + (2*p1*s1*(p2 - s2))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + (2*p2*(p2 - s2)*s2)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (2*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (pow(s1,2)*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (pow(s2,2)*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (2*p2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         (p1*s1*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (p2*s2*(2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+                 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+              (2*s1*(p2 - s2)*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+        *x3)/((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3));
+
+	H_tilde_partial(1, 2) = (pow(p1,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+         pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) + 
+      pow(p2,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+         pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) + 
+      pow(s1,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+      pow(s2,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+      (2*p1*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+      (2*p2*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+           pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+      ((pow(p1,2)*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         (pow(p2,2)*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         (pow(s1,2)*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (pow(s2,2)*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         (p1*s1*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (p2*s2*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (2*pow(s1,2)*(p3 - s3))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (2*pow(s2,2)*(p3 - s3))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          + (2*p1*s1*(p3 - s3))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + (2*p2*s2*(p3 - s3))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+         )*s3 - s1*(-(p1*p3*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+               (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         s1/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         p1/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p3*s1*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (p3*s1*(p3 - s3))/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (s1*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p1*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*s1*(p3 - s3)*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p1*(p3 - s3)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+         ) - s2*(-(p2*p3*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+               (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         s2/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         p2/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p3*s2*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (p3*s2*(p3 - s3))/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (s2*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p2*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*s2*(p3 - s3)*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p2*(p3 - s3)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+         ) + (-(p1*p3*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+               (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         s1/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         p1/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p3*s1*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (p3*s1*(p3 - s3))/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (s1*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p1*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*s1*(p3 - s3)*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p1*(p3 - s3)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+         )*x1 + (-(p2*p3*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+               (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+                pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         s2/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         p2/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p3*s2*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (p3*s2*(p3 - s3))/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           - (s2*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (p2*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*s3)/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          + (2*s2*(p3 - s3)*s3)/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (p2*(p3 - s3)*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+         )*x2 + ((pow(p1,2)*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         (pow(p2,2)*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)) + 
+         (pow(s1,2)*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+         (pow(s2,2)*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (2.*pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         (p1*s1*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (p2*s2*((2*s1*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+              (2*s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(p3 - s3))/
+               pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+          (pow(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2),1.5)*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+          - (2*pow(s1,2)*(p3 - s3))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          - (2*pow(s2,2)*(p3 - s3))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),2))\
+          + (2*p1*s1*(p3 - s3))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+           + (2*p2*s2*(p3 - s3))/
+          (sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))
+         )*x3)/((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3)) - 
+   ((-((-(pow(p1,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) - 
+             pow(p2,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+             pow(s1,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+             pow(s2,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+             (2*p1*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))\
+              + (2*p2*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                  pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))
+            *s3) - s1*((p1*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+           (p3*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+           (s1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+           (p1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))\
+         - s2*((p2*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+           (p3*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+           (s2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+           (p2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))\
+         + ((p1*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+           (p3*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+           (s1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+           (p1*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))*
+         x1 + ((p2*p3)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+           (p3*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+           (s2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+           (p2*s3)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))*
+         x2 + (-(pow(p1,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))) - 
+           pow(p2,2)/sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+              pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2)) - 
+           pow(s1,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+           pow(s2,2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+           (2*p1*s1)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+           (2*p2*s2)/(sqrt(pow(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2) + 
+                pow(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)),2))*sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))))*
+         x3)*(-p3 + s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) - 
+        (s1*(p3 - s3)*(-s1 + x1))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+        (s2*(p3 - s3)*(-s2 + x2))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+        (-(1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - ((p3 - s3)*s3)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*
+         (-s3 + x3)))/pow((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3),2);
+
+	H_tilde_partial(2, 0) = -(((-(s1*(p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))) - s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+          s3*(p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+          (p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x1 + 
+          (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x2 + (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x3
+          )*(-p1 + s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) + 
+          (-(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+             1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) - 
+          ((p1 - s1)*s2*(-s2 + x2))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+          ((p1 - s1)*s3*(-s3 + x3))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+      pow((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+        (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+        (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3),2)) + 
+   (-p1 - s1*(-(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+         1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+      ((p1 - s1)*pow(s2,2))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+      s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) + 
+      ((p1 - s1)*pow(s3,2))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+      (-(((p1 - s1)*s1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*
+       x1 - ((p1 - s1)*s2*x2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+      ((p1 - s1)*s3*x3)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))/
+    ((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3));
+
+	H_tilde_partial(2, 1) = -(((-(s1*(p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))) - s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+          s3*(p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+          (p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x1 + 
+          (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x2 + (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x3
+          )*(-p2 + s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) - 
+          (s1*(p2 - s2)*(-s1 + x1))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+          (-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+             1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) - 
+          ((p2 - s2)*s3*(-s3 + x3))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)))/
+      pow((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+        (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+        (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3),2)) + 
+   (-p2 - s2*(-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+         1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+      (pow(s1,2)*(p2 - s2))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+      s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) + 
+      ((p2 - s2)*pow(s3,2))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+      (s1*(p2 - s2)*x1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+      (-(((p2 - s2)*s2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*
+       x2 - ((p2 - s2)*s3*x3)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))/
+    ((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3));
+
+	H_tilde_partial(2, 2) = (-p3 + (pow(s1,2)*(p3 - s3))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+      (pow(s2,2)*(p3 - s3))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+      s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) - 
+      s3*(-(1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+         ((p3 - s3)*s3)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5)) - 
+      (s1*(p3 - s3)*x1)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+      (s2*(p3 - s3)*x2)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+      (-(1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - ((p3 - s3)*s3)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*x3
+      )/((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3)) - 
+   ((-(s1*(p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))) - 
+        s2*(p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - 
+        s3*(p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) + 
+        (p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x1 + 
+        (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x2 + (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*x3)*
+      (-p3 + s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)) - 
+        (s1*(p3 - s3)*(-s1 + x1))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) - 
+        (s2*(p3 - s3)*(-s2 + x2))/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5) + 
+        (-(1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2))) - ((p3 - s3)*s3)/pow(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2),1.5))*
+         (-s3 + x3)))/pow((p1 - s1/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s1 + x1) + 
+      (p2 - s2/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s2 + x2) + 
+      (p3 - s3/sqrt(pow(p1 - s1,2) + pow(p2 - s2,2) + pow(p3 - s3,2)))*(-s3 + x3),2);
+
+	// cout << "H_tilde_partial = \n" << H_tilde_partial << endl;
+
+	mat H_tilde = (DELTA.t() * DELTA).i() * DELTA.t() * T.i() * H_tilde_partial; // dh/ds
+
+	return H_tilde;
 }
