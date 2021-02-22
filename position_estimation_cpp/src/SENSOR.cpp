@@ -272,7 +272,6 @@ EKF SENSOR::ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE core, CONSTAN
 
 		for(int i = 0; i < num_meas; i++)
 		{
-
 			// cout << "Marker " << bag.markers[mid_valid[i]].position << endl;
 			yhat_tup = get_yhat(bag.markers[mid_valid[i]], core); // Get predicted measurement
 

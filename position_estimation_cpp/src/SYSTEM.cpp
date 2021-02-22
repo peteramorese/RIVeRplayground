@@ -89,7 +89,7 @@ void SYSTEM::assign_bag(BAG b)
 }
 
 
-void SYSTEM::calibrate(BAG cal)
+void SYSTEM::calibrate(BAG cal, std::vector<int> s)
 {
 	// Utilizes an Extended Kalman Filter (EKF) to calibrate the sensor positions for each sensor in the network
 	// 
@@ -97,19 +97,24 @@ void SYSTEM::calibrate(BAG cal)
 	// 		cal - [BAG] Series of markers with known locations used to calibrate the sensor positions
 	// 
 
-	cout << "Calibrating Sensors..." << endl;;
+	cout << "Calibrating Sensors..." << endl;
 
-	get_data(); // Read the sensor data
+	string filename;
+	filename = "../data/Y_cal_.txt";
 
-	for(int i = 0; i < cnst.m; i++) // For each sensor in the network
+	vector<vector<vector<DATA>>> Y = get_data(s, filename, 13); // Read the sensor data
+
+	for(int i = 0; i < s.size(); i++) // For each sensor in the network
 	{
-		cout << "\tCalibrating Sensor " << i << "...\t\t";
+		cout << "\tCalibrating Sensor " << s[i] << "...\t\t";
 
-		sensors[i].calibrate_sensor(Y[i], cal, core, cnst); // Calibrate Sensor SID
+		cout << " ";
+
+		sensors[s[i]].calibrate_sensor(Y[i], cal, core, cnst); // Calibrate Sensor SID
 
 		if(plot == true) // If the plot flag is set to true
 		{
-			sensors[i].plot_ekf(); // Plot the EKF results
+			sensors[s[i]].plot_ekf(); // Plot the EKF results
 			// sensors[i].plot_e_y();
 		}
 
@@ -120,24 +125,65 @@ void SYSTEM::calibrate(BAG cal)
 }
 
 
-void SYSTEM::get_data()
+void SYSTEM::calibrate_pickup(BAG cal)
+{
+	// Selects the correct sensors to calibrate (Sensors 0 - 4)
+	// 
+	// Inputs:
+	// 		cal - [BAG] Series of markers with known locations used to calibrate sensors 0 - 4
+	// 
+
+	std::vector<int> s;
+
+	for(int i = 0; i < 5; i++)
+	{
+		s.push_back(i);
+	}
+
+	calibrate(cal, s);
+}
+
+
+void SYSTEM::calibrate_dropoff(BAG cal)
+{
+	// Selects the correct sensors to calibrate (Sensors 5 - 9)
+	// 
+	// Inputs:
+	// 		cal - [BAG] Series of markers with known locations used to calibrate sensors 5 - 9
+	// 
+
+	std::vector<int> s;
+
+	for(int i = 0; i < 5; i++)
+	{
+		s.push_back(5 + i);
+	}
+
+	calibrate(cal, s);
+}
+
+
+vector<vector<vector<DATA>>> SYSTEM::get_data(std::vector<int> s, string filename, int i_repl)
 {
 	// Gets sensor data and organizes the data into a multidimensional vector.
 	// Function reads the data from files with the name: './data/Y_sim[sid].txt'
 	// 
+	// Inputs:
+	// 		filename - [string] Path and filename to the data file to read
+	// 		i_repl - [int] Index of the character in filename to replace and iterate for each sensor
 
+	vector<vector<vector<DATA>>> Y;
 	vector<vector<DATA>> Y_sid;
 
-	string filename;
-
-	for(int i = 0; i < cnst.m; i++) // For each sensor in the network
+	for(int i = 0; i < s.size(); i++) // For each sensor in the network
 	{
-		filename = "../data/Y_cal_.txt";
-		filename[13] = to_string(i)[0]; // Set the SID in the filename
+		filename[i_repl] = to_string(s[i])[0]; // Set the SID in the filename
 
 		Y_sid = read_data(filename); // Read the data file
 		Y.push_back(Y_sid); // Add the data vector to the multidimensional data vector
 	}
+
+	return Y;
 }
 
 
@@ -157,114 +203,134 @@ std::vector<std::vector<DATA>> SYSTEM::read_data(string filename)
 
 	std::ifstream file(filename);
 
-	string str;
-	string substr;
-	int cnt;
-	DATA y_k;
-
-	vector<int> mids; // Vector containing the Marker IDs of measured markers at time k
-	vector<int> mid_meas; // Vector containing the number of times a Marker ID has been measured at time k
-
-	while(std::getline(file, str)) // Read each line of the data file
+	if(file.good())
 	{
-		stringstream part(str);
+		string str;
+		string substr;
+		int cnt;
+		DATA y_k;
 
-		cnt = 0;
+		vector<int> mids; // Vector containing the Marker IDs of measured markers at time k
+		vector<int> mid_meas; // Vector containing the number of times a Marker ID has been measured at time k
 
-		bool clr = false;
-
-		while(part.good()) 
+		while(std::getline(file, str)) // Read each line of the data file
 		{
-			cnt++;
+			stringstream part(str);
 
-			getline(part, substr, ','); // Read each comma-separated field of the line
+			cnt = 0;
 
-			// Assign correct data fields
-			if(cnt == 1) // x measurement
+			bool clr = false;
+
+			while(part.good()) 
 			{
-				y_k.x = stod(substr);
-			}
-			else if(cnt == 2) // y measurement
-			{
-				y_k.y = stod(substr);
-			}
-			else if(cnt == 3) // Marker ID mid
-			{
-				y_k.mid = stoi(substr);
+				cnt++;
 
-				// This next part of the function determines how many times each marker has been measured at time k
-				// If this measurement is the first measurement of marker mid, continue adding data for time k
-				// If this measurement is the second measurement of marker mid, push the data (not including this second measurement)
-				// and then move to time k+1
-				// This prevents multiple measurements of the same marker from being used at the same time k
+				getline(part, substr, ','); // Read each comma-separated field of the line
 
-				bool found = false;
-				int i_found;
-
-				for(int i = 0; i < mids.size(); i++) // Loop through the marker IDs that have been measured
+				// Assign correct data fields
+				if(cnt == 1) // x measurement
 				{
-					if(mids[i] == y_k.mid) // If the current measurement marker ID is there, flag it
+					y_k.x = stod(substr);
+				}
+				else if(cnt == 2) // y measurement
+				{
+					y_k.y = stod(substr);
+				}
+				else if(cnt == 3) // Marker ID mid
+				{
+					y_k.mid = stoi(substr);
+
+					// This next part of the function determines how many times each marker has been measured at time k
+					// If this measurement is the first measurement of marker mid, continue adding data for time k
+					// If this measurement is the second measurement of marker mid, push the data (not including this second measurement)
+					// and then move to time k+1
+					// This prevents multiple measurements of the same marker from being used at the same time k
+
+					bool found = false;
+					int i_found;
+
+					for(int i = 0; i < mids.size(); i++) // Loop through the marker IDs that have been measured
 					{
-						found = true;
-						i_found = i;
+						if(mids[i] == y_k.mid) // If the current measurement marker ID is there, flag it
+						{
+							found = true;
+							i_found = i;
+						}
+					}
+
+					if(found == false) // If the marker ID was not found, add the marker ID to mids
+					{
+						mids.push_back(y_k.mid);
+						mid_meas.push_back(1); // Record that the marker ID has been measured once
+					}
+					else // If the marker ID was found, increment the measurement count for that marker
+					{
+						mid_meas[i_found] = mid_meas[i_found] + 1;
+						if(mid_meas[i_found] == 2) // If this is the second measurement of marker MID, flag it
+						{
+							clr =  true;
+						}
 					}
 				}
-
-				if(found == false) // If the marker ID was not found, add the marker ID to mids
+				else if(cnt == 4) // Sensor ID sid
 				{
-					mids.push_back(y_k.mid);
-					mid_meas.push_back(1); // Record that the marker ID has been measured once
+					y_k.sid = stoi(substr);
 				}
-				else // If the marker ID was found, increment the measurement count for that marker
+			}
+
+			if(clr == true) // If any marker has been measured twice
+			{
+				Y_sid.push_back(Y_k); // Add the data for time k
+				Y_k.clear(); // Clear the time k measurement vector
+
+				for(int i = 0; i < mid_meas.size(); i++) // Loop through the measurement counts
 				{
-					mid_meas[i_found] = mid_meas[i_found] + 1;
-					if(mid_meas[i_found] == 2) // If this is the second measurement of marker MID, flag it
+					if(mid_meas[i] > 0) // Decrement the count if it is not equal to zero
 					{
-						clr =  true;
+						mid_meas[i] = mid_meas[i] - 1;
 					}
 				}
 			}
-			else if(cnt == 4) // Sensor ID sid
-			{
-				y_k.sid = stoi(substr);
-			}
+
+			// Add DATA measurement to vectors here
+			Y_k.push_back(y_k);
 		}
-
-		if(clr == true) // If any marker has been measured twice
-		{
-			Y_sid.push_back(Y_k); // Add the data for time k
-			Y_k.clear(); // Clear the time k measurement vector
-
-			for(int i = 0; i < mid_meas.size(); i++) // Loop through the measurement counts
-			{
-				if(mid_meas[i] > 0) // Decrement the count if it is not equal to zero
-				{
-					mid_meas[i] = mid_meas[i] - 1;
-				}
-			}
-		}
-
-		// Add DATA measurement to vectors here
-		Y_k.push_back(y_k);
+	}
+	else
+	{
+		cout << "File: " << filename << " does not exist" << endl;
 	}
 
 	return Y_sid;
 }
 
 
-void SYSTEM::run_estimator()
+// void SYSTEM::clear_data()
+// {
+// 	Y.clear();
+// }
+
+
+void SYSTEM::run_estimator(std::vector<int> s)
 {
 	// Uses Pixy sensor data to run an Extended Kalman Filter (EKF) for each marker that contains measurements
 	// 
 
 	cout << "Running Position Estimator..." << endl;
 
+	// clear_data();
+
+	string filename = "../data/Y_sim__bag1.txt";
+	vector<vector<vector<DATA>>> Y = get_data(s, filename, 13);
+
 	vector<vector<vector<DATA>>> Y_reorg;
 
-	Y_reorg = reorg_data(); // Reorganize the data vector
+	Y_reorg = reorg_data(Y); // Reorganize the data vector
 
+	cout << "Here" << endl;
 	for(int mid = 0; mid < Y_reorg.size(); mid++)
 	{
+		cout << "Y" << Y_reorg[mid].size() << endl;
 		if(Y_reorg[mid].size() > 0)
 		{
 			cout << "\tEstimating Marker " << mid << "... ";
@@ -313,7 +379,7 @@ void SYSTEM::set_sensors_min()
 }
 
 
-vector<vector<vector<DATA>>> SYSTEM::reorg_data()
+vector<vector<vector<DATA>>> SYSTEM::reorg_data(vector<vector<vector<DATA>>> Y)
 {
 	// Function to reorganize the data vector Y from Y[sid][k][mid] to Y[mid][k][sid]
 	// 
@@ -331,12 +397,15 @@ vector<vector<vector<DATA>>> SYSTEM::reorg_data()
 		{
 			for(int sid = 0; sid < Y.size(); sid++) // Loop through all sensors
 			{
-				for(int m = 0; m < Y[sid][k].size(); m++) // Loop through all DATA objects
+				if(Y[sid].size() > 0)
 				{
-					if(Y[sid][k][m].mid == mid) // If the measurement is for Marker mid, add it to the vector
+					for(int m = 0; m < Y[sid][k].size(); m++) // Loop through all DATA objects
 					{
-						Y_sid.push_back(Y[sid][k][m]);
-						break;
+						if(Y[sid][k][m].mid == mid) // If the measurement is for Marker mid, add it to the vector
+						{
+							Y_sid.push_back(Y[sid][k][m]);
+							break;
+						}
 					}
 				}
 			}
