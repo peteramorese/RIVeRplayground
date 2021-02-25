@@ -25,7 +25,9 @@ SENSORS_true.constants.theta = 40 / 2; % [deg] Vertical FOV half angle
 
 %% Sensor 1 Frame (defined in the Core Frame)
 % s1_C = [0.5; -0.55; -0.98] + [0.0888; 0.2078; 0.0223]; % Position of Sensor 1 (defined in the C Frame)
-s1_C = [0.4142; 1.1214; 0.4052] + [0.0888; 0.2078; 0.0223];
+% s1_C = [0.4142; 1.1214; 0.4052] + [0.0888; 0.2078; 0.0223]; % USED FOR
+% SIM DATA
+s1_C = [0.4142; 0.8; 0.4052] + [0.0888; 0.2078; 0.0223];
 
 SENSORS_true.S1.pos = s1_C; % Position of Sensor 1 (defined in the C Frame)
 SENSORS_true.S1.point = CORE.origin; % Reference point centered in the sensor's FOV
@@ -57,7 +59,7 @@ SENSORS_true.S3.Q_C = CORE.frame*SENSORS_true.S3.frame; % Direction Cosine Matri
 clear s3_C
 
 %% Sensor 4 Frame (defined in the Core Frame)
-s4_C = [.75; -0.7242; 0.9479] + [0.0538; 0.1834; -0.2259];
+s4_C = [.75; -0.7242; 1.25] + [0.0538; 0.1834; -0.2259];
 
 SENSORS_true.S4.pos = s4_C; % Position of Sensor 3 (defined in the C Frame)
 SENSORS_true.S4.point = CORE.origin; % Reference point centered in the sensor's FOV

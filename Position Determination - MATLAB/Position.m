@@ -39,7 +39,7 @@ Calibrate.markers.M3 = [0.1; -0.05; 0]; % Redefine the known position of M3
 
 % filename = 'Y_sim.txt';
 
-for sid = 1:3
+for sid = 1:5
     
     sid_str = sprintf('S%d', sid);
     
@@ -48,18 +48,18 @@ for sid = 1:3
 
     Y_cal = get_sim_data(sid, MID_mat, t, R, CORE, Calibrate, SENSORS_true);
     
-    filename = sprintf('Y_sim%d.txt', sid);
+    filename = sprintf('Y_cal%d.txt', sid-1);
     
     write_sim_data(filename, Y_cal);
 
-    x0 = SENSORS_true.(sid_str).pos + mvnrnd([0; 0; 0], 0.01*eye(3))';
-
-    [ekf_cal, SENSORS_calib] = run_ekf_calib(t, Y_cal, x0, R, Calibrate, sid, CORE, SENSORS_calib, CONSTANTS);
-
-    meas_innov = get_meas_innov(t, ekf_cal);
-    innov_fig = figure; plot_meas_innov(t, meas_innov, 1, innov_fig);
-    
-    plot_estimate(t, ekf_cal, sprintf('Sensor S%d', sid), 0, 'calibration.png')
+%     x0 = SENSORS_true.(sid_str).pos + mvnrnd([0; 0; 0], 0.01*eye(3))';
+% 
+%     [ekf_cal, SENSORS_calib] = run_ekf_calib(t, Y_cal, x0, R, Calibrate, sid, CORE, SENSORS_calib, CONSTANTS);
+% 
+%     meas_innov = get_meas_innov(t, ekf_cal);
+%     innov_fig = figure; plot_meas_innov(t, meas_innov, 1, innov_fig);
+%     
+%     plot_estimate(t, ekf_cal, sprintf('Sensor S%d', sid), 0, 'calibration.png')
 
 end
 
@@ -75,17 +75,22 @@ roll = 100*randn;
 pitch = 100*randn;
 yaw = 100*randn;
 
-% fprintf('r = %.3f \t p = %.3f \t y = %.3f\n', roll, pitch, yaw);
+fprintf('r = %.3f \t p = %.3f \t y = %.3f\n', roll, pitch, yaw);
 
-% BAG1 = get_marker_locations(BAG, [0.21; 0.05; -0.15], roll, pitch, yaw);
+Q = euler_to_DCM(roll, pitch, yaw);
+fprintf('Q = \t%.3f \t %.3f \t %.3f\n', Q(1, :));
+fprintf('\t\t%.3f \t %.3f \t %.3f\n', Q(2, :));
+fprintf('\t\t%.3f \t %.3f \t %.3f\n', Q(3, :));
+
+BAG1 = get_marker_locations(BAG, [0.21; 0.05; -0.15], roll, pitch, yaw);
 % BAG1 = get_marker_locations(BAG, [2.55; 0.855; -0.75], roll, pitch, yaw);
-BAG1.markers.M1 = [0; 0.1; 0.1]; % Redefine the known position of M1
-BAG1.markers.M2 = [0.05; -0.05; 0.1]; % Redefine the known position of M2
-BAG1.markers.M3 = [0.1; -0.05; 0]; % Redefine the known position of M3
-BAG1.markers.M4 = [2.25; 0.85; -0.8];
-BAG1.markers.M5 = [2.5; 0.9; -0.8];
-BAG1.markers.M6 = [2.3; 0.75; -0.75];
-BAG1.x = zeros(3, 1);
+% BAG1.markers.M1 = [0; 0.1; 0.1]; % Redefine the known position of M1
+% BAG1.markers.M2 = [0.05; -0.05; 0.1]; % Redefine the known position of M2
+% BAG1.markers.M3 = [0.1; -0.05; 0]; % Redefine the known position of M3
+% BAG1.markers.M4 = [2.25; 0.85; -0.8];
+% BAG1.markers.M5 = [2.5; 0.9; -0.8];
+% BAG1.markers.M6 = [2.3; 0.75; -0.75];
+% BAG1.x = zeros(3, 1);
 
 fig = figure;
 vis_axes = axes;
@@ -109,7 +114,7 @@ for i = 1:6
     text(1.1*x, 1.1*y, 1.1*z, m_str);
 end
 
-for i = 1:CONSTANTS.m
+for i = 1:CONSTANTS.m/2
     s_str = sprintf('S%d', i);
     x = SENSORS_true.(s_str).pos(1);
     y = SENSORS_true.(s_str).pos(2);
@@ -130,7 +135,7 @@ ylim([-3 3])
 
 MID_mat = zeros(6, CONSTANTS.m);
 
-for i = 1:CONSTANTS.m
+for i = 1:CONSTANTS.m/2
     s_str = sprintf('S%d', i);
     for j = 1:6
         m_str = sprintf('M%d', j);
@@ -144,7 +149,7 @@ for i = 1:CONSTANTS.m
         
 %         fprintf('S%d   M%d   x = %.3f    y = %.3f    ang = %.3f [deg]\n', i, j, yh(1), yh(2), ang);
         
-        if ~isnan(yh(1)) % && ang < 75
+        if ~isnan(yh(1)) && ang < 75
             
             MID_mat(j, i) = 1;
             
@@ -153,15 +158,104 @@ for i = 1:CONSTANTS.m
     end
 end
 
-for sid = 1:CONSTANTS.m
+for sid = 1:CONSTANTS.m/2
 
     Y_cal = get_sim_data(sid, find(MID_mat(:, sid)), t, R, CORE, BAG1, SENSORS_true);
     
-    filename = sprintf('Y_cal%d.txt', sid-1);
+    filename = sprintf('Y_sim%d_test.txt', sid-1);
     
     write_sim_data(filename, Y_cal);
     
 end
+
+
+%% Visibility Test
+close all; clc;
+
+N = 100; % Number of simulations to run
+angles = zeros(3, N);
+view = zeros(1, N);
+
+for k = 1:N
+
+    roll = 100*randn;
+    pitch = 100*randn;
+    yaw = 100*randn;
+    
+    angles(1, k) = roll;
+    angles(2, k) = pitch;
+    angles(3, k) = yaw;
+
+    BAG1 = get_marker_locations(BAG, [0.21; 0.05; -0.15], roll, pitch, yaw);
+
+    MID_mat = zeros(6, CONSTANTS.m);
+
+    for i = 1:CONSTANTS.m
+        s_str = sprintf('S%d', i);
+        for j = 1:6
+            m_str = sprintf('M%d', j);
+            m_vec = BAG1.x - BAG1.markers.(m_str);
+
+            s_vec = BAG1.x - SENSORS_true.(s_str).pos;
+
+            ang = acosd(dot(m_vec, s_vec)/(norm(m_vec)*norm(s_vec))); % [deg]
+
+            yh = get_yhat(BAG1.markers.(m_str), R, CORE, SENSORS_true, i, 0);
+
+            if ~isnan(yh(1)) && ang < 75
+
+                MID_mat(j, i) = 1;
+
+            end
+        end
+    end
+    view(k) = sum(sum(MID_mat, 2) > 1);
+    if view(k) < 3
+        hi = 1;
+        if 0
+            fig = figure;
+            vis_axes = axes;
+
+            plot_vec([0;0;0], CORE.x, 'k', 'Cx', vis_axes, 0);
+            hold on;
+            plot_vec([0;0;0], CORE.y, 'k', 'Cy', vis_axes, 0);
+            plot_vec([0;0;0], CORE.z, 'k', 'Cz', vis_axes, 0);
+
+            plot3(BAG1.x(1), BAG1.x(2), BAG1.x(3), 'ko', 'LineWidth', 2);
+
+            for i = 1:6
+                m_str = sprintf('M%d', i);
+                x = BAG1.markers.(m_str)(1);
+                y = BAG1.markers.(m_str)(2);
+                z = BAG1.markers.(m_str)(3);
+
+                plot3(x,y,z, 'bo', 'LineWidth', 2);
+                text(1.1*x, 1.1*y, 1.1*z, m_str);
+            end
+
+            for i = 1:CONSTANTS.m
+                s_str = sprintf('S%d', i);
+                x = SENSORS_true.(s_str).pos(1);
+                y = SENSORS_true.(s_str).pos(2);
+                z = SENSORS_true.(s_str).pos(3);
+
+                plot3(x, y, z, 'ro', 'LineWidth', 2);
+                text(1.1*x, 1.1*y, 1.1*z, s_str);
+
+            end
+
+            plot_core(vis_axes);
+            ylim([-3 3]);
+            MID_mat;
+            hi = 1;
+        end
+
+    end
+end
+
+perc = sum(view > 2)/length(view);
+fprintf('5 Sensors can determine the bag %.2f %% of the time\n', perc*100);
+
 
 %%
 S_positions = zeros(10, 3);
