@@ -89,7 +89,7 @@ void SYSTEM::assign_bag(BAG b)
 }
 
 
-void SYSTEM::calibrate(BAG cal)
+void SYSTEM::calibrate(BAG cal, std::vector<int> s)
 {
 	// Utilizes an Extended Kalman Filter (EKF) to calibrate the sensor positions for each sensor in the network
 	// 
@@ -97,19 +97,25 @@ void SYSTEM::calibrate(BAG cal)
 	// 		cal - [BAG] Series of markers with known locations used to calibrate the sensor positions
 	// 
 
-	cout << "Calibrating Sensors..." << endl;;
+	cout << "Calibrating Sensors..." << endl;
 
-	get_data(); // Read the sensor data
+	string filename;
+	filename = "../data/Y_cal_.txt";
 
-	for(int i = 0; i < cnst.m; i++) // For each sensor in the network
+	vector<vector<vector<DATA>>> Y = get_data(s, filename, 13); // Read the sensor data
+
+	for(int i = 0; i < s.size(); i++) // For each sensor in the network
 	{
-		cout << "\tCalibrating Sensor " << i << "...\t\t";
+		cout << "\tCalibrating Sensor " << s[i] << "...\t\t";
 
-		sensors[i].calibrate_sensor(Y[i], cal, core, cnst); // Calibrate Sensor SID
+		cout << " ";
+
+		sensors[s[i]].calibrate_sensor(Y[i], cal, core, cnst); // Calibrate Sensor SID
 
 		if(plot == true) // If the plot flag is set to true
 		{
-			sensors[i].plot_ekf(); // Plot the EKF results
+			sensors[s[i]].plot_ekf(); // Plot the EKF results
+			// sensors[i].plot_e_y();
 		}
 
 		cout << "DONE" << endl;
@@ -119,172 +125,41 @@ void SYSTEM::calibrate(BAG cal)
 }
 
 
-void SYSTEM::get_data()
+void SYSTEM::calibrate_pickup(BAG cal)
 {
-	// Gets sensor data and organizes the data into a multidimensional vector.
-	// Function reads the data from files with the name: './data/Y_sim[sid].txt'
-	// 
-
-	vector<vector<DATA>> Y_sid;
-
-	string filename;
-
-	for(int i = 0; i < cnst.m; i++) // For each sensor in the network
-	{
-		filename = "../data/Y_sim_.txt";
-		filename[13] = to_string(i+1)[0]; // Set the SID in the filename
-
-		Y_sid = read_data(filename); // Read the data file
-		Y.push_back(Y_sid); // Add the data vector to the multidimensional data vector
-	}
-}
-
-
-std::vector<std::vector<DATA>> SYSTEM::read_data(string filename)
-{
-	// Reads the data file and extracts the data to a multidimensional vector
+	// Selects the correct sensors to calibrate (Sensors 0 - 4)
 	// 
 	// Inputs:
-	// 		filename - [string] Path and filename to the data file
-	// 
-	// Outputs:
-	// 		Y_sid - [vector<vector<DATA>>] Vector containing data for all time k for each marker MID
+	// 		cal - [BAG] Series of markers with known locations used to calibrate sensors 0 - 4
 	// 
 
-	std::vector<std::vector<DATA>> Y_sid;
-	std::vector<DATA> Y_k;
+	std::vector<int> s;
 
-	std::ifstream file(filename);
-
-	string str;
-	string substr;
-	int cnt;
-	// int i = 0;
-	DATA y_k;
-
-	vector<int> mids; // Vector containing the Marker IDs of measured markers at time k
-	vector<int> mid_meas; // Vector containing the number of times a Marker ID has been measured at time k
-
-	while(std::getline(file, str)) // Read each line of the data file
+	for(int i = 0; i < 5; i++)
 	{
-		stringstream part(str);
-
-		cnt = 0;
-
-		bool clr = false;
-
-		while(part.good()) 
-		{
-			cnt++;
-
-			getline(part, substr, ','); // Read each comma-separated field of the line
-
-			// Assign correct data fields
-			if(cnt == 1) // x measurement
-			{
-				y_k.x = stod(substr);
-			}
-			else if(cnt == 2) // y measurement
-			{
-				y_k.y = stod(substr);
-			}
-			else if(cnt == 3) // Marker ID mid
-			{
-				y_k.mid = stoi(substr) - 1;
-
-				// This next part of the function determines how many times each marker has been measured at time k
-				// If this measurement is the first measurement of marker mid, continue adding data for time k
-				// If this measurement is the second measurement of marker mid, push the data (not including this second measurement)
-				// and then move to time k+1
-				// This prevents multiple measurements of the same marker from being used at the same time k
-
-				bool found = false;
-				int i_found;
-
-				for(int i = 0; i < mids.size(); i++) // Loop through the marker IDs that have been measured
-				{
-					if(mids[i] == y_k.mid) // If the current measurement marker ID is there, flag it
-					{
-						found = true;
-						i_found = i;
-					}
-				}
-
-				if(found == false) // If the marker ID was not found, add the marker ID to mids
-				{
-					mids.push_back(y_k.mid);
-					mid_meas.push_back(1); // Record that the marker ID has been measured once
-				}
-				else // If the marker ID was found, increment the measurement count for that marker
-				{
-					mid_meas[i_found] = mid_meas[i_found] + 1;
-					if(mid_meas[i_found] == 2) // If this is the second measurement of marker MID, flag it
-					{
-						clr =  true;
-					}
-				}
-			}
-			else if(cnt == 4) // Sensor ID sid
-			{
-				y_k.sid = stoi(substr) - 1;
-			}
-		}
-
-		if(clr == true) // If any marker has been measured twice
-		{
-			Y_sid.push_back(Y_k); // Add the data for time k
-			Y_k.clear(); // Clear the time k measurement vector
-
-			for(int i = 0; i < mid_meas.size(); i++) // Loop through the measurement counts
-			{
-				if(mid_meas[i] > 0) // Decrement the count if it is not equal to zero
-				{
-					mid_meas[i] = mid_meas[i] - 1;
-				}
-			}
-		}
-
-		// Add DATA measurement to vectors here
-		Y_k.push_back(y_k);
+		s.push_back(i);
 	}
 
-	return Y_sid;
+	calibrate(cal, s);
 }
 
 
-void SYSTEM::run_estimator()
+void SYSTEM::calibrate_dropoff(BAG cal)
 {
-	// Uses Pixy sensor data to run an Extended Kalman Filter (EKF) for each marker that contains measurements
+	// Selects the correct sensors to calibrate (Sensors 5 - 9)
+	// 
+	// Inputs:
+	// 		cal - [BAG] Series of markers with known locations used to calibrate sensors 5 - 9
 	// 
 
-	cout << "Running Position Estimator..." << endl;
+	std::vector<int> s;
 
-	vector<vector<vector<DATA>>> Y_reorg;
-
-	Y_reorg = reorg_data(); // Reorganize the data vector
-
-	for(int mid = 0; mid < Y_reorg.size(); mid++)
+	for(int i = 0; i < 5; i++)
 	{
-		if(Y_reorg[mid].size() > 0)
-		{
-			cout << "\tEstimating Marker " << mid << "... ";
-
-			bag.markers[mid].estimate_pos(Y_reorg[mid], sensors_min, core, cnst); // Estimate the position of Marker MID
-
-			if(plot == true) // If the plot flag is set to true
-			{
-				bag.markers[mid].plot_ekf(); 
-			}
-
-			cout << "DONE" << endl;
-		}
+		s.push_back(5 + i);
 	}
 
-	cout << "Running Orientation Estimator..." << endl;
-
-	bag.estimate_ori();
-
-	cout << "DONE" << endl;
+	calibrate(cal, s);
 }
 
 
@@ -313,7 +188,221 @@ void SYSTEM::set_sensors_min()
 }
 
 
-vector<vector<vector<DATA>>> SYSTEM::reorg_data()
+vector<vector<vector<DATA>>> SYSTEM::get_data(std::vector<int> s, string filename, int i_repl)
+{
+	// Gets sensor data and organizes the data into a multidimensional vector.
+	// Function reads the data from files with the name: './data/Y_sim[sid].txt'
+	// 
+	// Inputs:
+	// 		filename - [string] Path and filename to the data file to read
+	// 		i_repl - [int] Index of the character in filename to replace and iterate for each sensor
+
+	vector<vector<vector<DATA>>> Y;
+	vector<vector<DATA>> Y_sid;
+
+	for(int i = 0; i < s.size(); i++) // For each sensor in the network
+	{
+		filename[i_repl] = to_string(s[i])[0]; // Set the SID in the filename
+
+		Y_sid = read_data(filename); // Read the data file
+		Y.push_back(Y_sid); // Add the data vector to the multidimensional data vector
+	}
+
+	return Y;
+}
+
+
+std::vector<std::vector<DATA>> SYSTEM::read_data(string filename)
+{
+	// Reads the data file and extracts the data to a multidimensional vector
+	// 
+	// Inputs:
+	// 		filename - [string] Path and filename to the data file
+	// 
+	// Outputs:
+	// 		Y_sid - [vector<vector<DATA>>] Vector containing data for all time k for each marker MID
+	// 
+
+	std::vector<std::vector<DATA>> Y_sid;
+	std::vector<DATA> Y_k;
+
+	std::ifstream file(filename);
+
+	if(file.good())
+	{
+		string str;
+		string substr;
+		int cnt;
+		DATA y_k;
+
+		vector<int> mids; // Vector containing the Marker IDs of measured markers at time k
+		vector<int> mid_meas; // Vector containing the number of times a Marker ID has been measured at time k
+
+		while(std::getline(file, str)) // Read each line of the data file
+		{
+			stringstream part(str);
+
+			cnt = 0;
+
+			bool clr = false;
+
+			while(part.good()) 
+			{
+				cnt++;
+
+				getline(part, substr, ','); // Read each comma-separated field of the line
+
+				// Assign correct data fields
+				if(cnt == 1) // x measurement
+				{
+					y_k.x = stod(substr);
+				}
+				else if(cnt == 2) // y measurement
+				{
+					y_k.y = stod(substr);
+				}
+				else if(cnt == 3) // Marker ID mid
+				{
+					y_k.mid = stoi(substr);
+
+					// This next part of the function determines how many times each marker has been measured at time k
+					// If this measurement is the first measurement of marker mid, continue adding data for time k
+					// If this measurement is the second measurement of marker mid, push the data (not including this second measurement)
+					// and then move to time k+1
+					// This prevents multiple measurements of the same marker from being used at the same time k
+
+					bool found = false;
+					int i_found;
+
+					for(int i = 0; i < mids.size(); i++) // Loop through the marker IDs that have been measured
+					{
+						if(mids[i] == y_k.mid) // If the current measurement marker ID is there, flag it
+						{
+							found = true;
+							i_found = i;
+						}
+					}
+
+					if(found == false) // If the marker ID was not found, add the marker ID to mids
+					{
+						mids.push_back(y_k.mid);
+						mid_meas.push_back(1); // Record that the marker ID has been measured once
+					}
+					else // If the marker ID was found, increment the measurement count for that marker
+					{
+						mid_meas[i_found] = mid_meas[i_found] + 1;
+						if(mid_meas[i_found] == 2) // If this is the second measurement of marker MID, flag it
+						{
+							clr =  true;
+						}
+					}
+				}
+				else if(cnt == 4) // Sensor ID sid
+				{
+					y_k.sid = stoi(substr);
+				}
+			}
+
+			if(clr == true) // If any marker has been measured twice
+			{
+				Y_sid.push_back(Y_k); // Add the data for time k
+				Y_k.clear(); // Clear the time k measurement vector
+
+				for(int i = 0; i < mid_meas.size(); i++) // Loop through the measurement counts
+				{
+					if(mid_meas[i] > 0) // Decrement the count if it is not equal to zero
+					{
+						mid_meas[i] = mid_meas[i] - 1;
+					}
+				}
+			}
+
+			// Add DATA measurement to vectors here
+			Y_k.push_back(y_k);
+		}
+	}
+	else
+	{
+		cout << "File: " << filename << " does not exist" << endl;
+	}
+
+	return Y_sid;
+}
+
+
+void SYSTEM::run_estimator(std::vector<int> s)
+{
+	// Uses Pixy sensor data to run an Extended Kalman Filter (EKF) for each marker that contains measurements
+	// 
+	// Inputs:
+	// 		s - [vector<int>] Vector containing the Sensor IDs to run the estimator with
+	// 
+
+	cout << "Running Position Estimator..." << endl;
+
+	string filename = "../data/Y_sim__bag1.txt";
+	vector<vector<vector<DATA>>> Y = get_data(s, filename, 13);
+
+	vector<vector<vector<DATA>>> Y_reorg;
+
+	Y_reorg = reorg_data(Y); // Reorganize the data vector
+
+	for(int mid = 0; mid < Y_reorg.size(); mid++)
+	{
+		if(Y_reorg[mid].size() > 0)
+		{
+			cout << "\tEstimating Marker " << mid << "... ";
+
+			bag.markers[mid].estimate_pos(Y_reorg[mid], sensors_min, core, cnst); // Estimate the position of Marker MID
+
+			if(plot == true) // If the plot flag is set to true
+			{
+				bag.markers[mid].plot_ekf(); 
+			}
+
+			cout << "DONE" << endl;
+		}
+	}
+
+	cout << "Running Orientation Estimator..." << endl;
+
+	bag.estimate_ori();
+
+	cout << "DONE" << endl;
+}
+
+
+void SYSTEM::run_estimator_pickup()
+{
+	// Function to run the estimation algorithm at the pickup location
+
+	std::vector<int> s;
+
+	for(int i = 0; i < 5; i++)
+	{
+		s.push_back(i);
+	}
+
+	run_estimator(s);
+}
+
+
+void SYSTEM::run_estimator_dropoff()
+{
+	// Function to run the estimation algorithm at the pickup location
+
+	std::vector<int> s;
+
+	for(int i = 5; i < 10; i++)
+	{
+		s.push_back(i);
+	}
+
+	run_estimator(s);
+}
+
+
+vector<vector<vector<DATA>>> SYSTEM::reorg_data(vector<vector<vector<DATA>>> Y)
 {
 	// Function to reorganize the data vector Y from Y[sid][k][mid] to Y[mid][k][sid]
 	// 
@@ -331,12 +420,15 @@ vector<vector<vector<DATA>>> SYSTEM::reorg_data()
 		{
 			for(int sid = 0; sid < Y.size(); sid++) // Loop through all sensors
 			{
-				for(int m = 0; m < Y[sid][k].size(); m++) // Loop through all DATA objects
+				if(Y[sid].size() > 0)
 				{
-					if(Y[sid][k][m].mid == mid) // If the measurement is for Marker mid, add it to the vector
+					for(int m = 0; m < Y[sid][k].size(); m++) // Loop through all DATA objects
 					{
-						Y_sid.push_back(Y[sid][k][m]);
-						break;
+						if(Y[sid][k][m].mid == mid) // If the measurement is for Marker mid, add it to the vector
+						{
+							Y_sid.push_back(Y[sid][k][m]);
+							break;
+						}
 					}
 				}
 			}
