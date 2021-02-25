@@ -5,22 +5,19 @@ int main()
 {
 
 // Default settings
-bool sim = false; // Set run mode to simulation
-bool plot = true; // Set the plot flag
+bool sim = true; // Set run mode to simulation
+bool plot = false; // Set the plot flag
 	
 
 bool menu = true;
 int opt;
 
-SYSTEM system(sim, plot);
-
 while(menu == true)
 {
 	cout << "\n\n\t\tInitialization Menu\t\t" << endl;
 	cout << "----------------------------------------------------------" << endl;
-	cout << "1) Initialize Sensor Network" << endl;
-	cout << "2) Settings" << endl;
-	cout << "0) Exit\n" << endl;
+	cout << "1) Settings" << endl;
+	cout << "2) Initialize System\n" << endl;
 
 	cin >> opt;
 
@@ -29,13 +26,6 @@ while(menu == true)
 	switch(opt)
 	{
 		case 1 :
-		{
-			// Initialize SYSTEM object
-			// SYSTEM system(sim, plot);
-			menu = false;
-			break;
-		}
-		case 2 :
 		{
 			bool submenu = true;
 
@@ -110,26 +100,31 @@ while(menu == true)
 					case 0 :
 					{
 						submenu = false;
-						set = 1;
 						break;
 					}
 				}
 			}
+			break;
 		}
-		case 0 :
+		cout << "opt = " << opt << endl;
+		case 2 :
 		{
-			cout << "Exiting..." << endl;
 			menu = false;
 			break;
 		}
 		default :
 		{
 			cout << "Invalid Selection" << endl;
+			break;
 		}
 	}
-
+	cout << "\n\n\n\n\n\n" << endl;
 }
 
+// Initialize the System
+SYSTEM system(sim, plot);
+
+// Main Menu
 menu = true;
 
 while(menu == true)
@@ -140,7 +135,6 @@ while(menu == true)
 	cout << "2) Calibrate Dropoff Sensors" << endl;
 	cout << "3) Scan Pickup" << endl;
 	cout << "4) Scan Dropoff" << endl;
-	cout << "9) Settings" << endl;
 	cout << "0) Exit\n" << endl;
 
 	cin >> opt;
@@ -175,53 +169,23 @@ while(menu == true)
 
 			break;
 		}
-		case 9 :
+		case 3:
 		{
-			bool submenu = true;
+			BAG bag1(6);
+			system.assign_bag(bag1);
 
-			while(submenu == true)
-			{
-				int set;
-				cout << "Select a Setting to Change:" << endl;
-				cout << "1) Plotting: " << plot << endl;
-				cout << "0) Back to the Menu\n" << endl;
+			system.run_estimator_pickup();
 
-				cin >> set;
+			break;
+		}
+		case 4 :
+		{
+			BAG bag2(6);
+			system.assign_bag(bag2);
 
-				cout << endl;
-
-				switch(set)
-				{
-					case 1 :
-					{
-						int plot_flag;
-
-						cout << "Plotting:" << endl;
-						cout << "1) Display Plots" << endl;
-						cout << "2) Suppress Plots\n" << endl;
-
-						cin >> plot_flag;
-
-						cout << endl;
-
-						if(plot_flag == 1)
-						{
-							plot = true;
-						}
-						else
-						{
-							plot = false;
-						}
-
-						break;
-					}
-					case 0 :
-					{
-						submenu = false;
-						break;
-					}
-				}
-			}
+			system.run_estimator_dropoff();
+			
+			break;
 		}
 		case 0 :
 		{

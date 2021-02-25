@@ -163,6 +163,31 @@ void SYSTEM::calibrate_dropoff(BAG cal)
 }
 
 
+void SYSTEM::set_sensors_min()
+{
+	// Assign the properties of the minimal sensor network
+	// The SENSOR_MIN class is used for bag estimation after calibration has been completed
+	// Objects contain only the necessary data for bag estimation
+	// 
+
+	SENSOR_MIN s_min;
+
+	for(int i = 0; i < sensors.size(); i++) // For each sensor defined in the network
+	{
+		s_min.position = sensors[i].position;
+		s_min.point = sensors[i].point;
+		s_min.frame = sensors[i].frame;
+		s_min.Q_C = sensors[i].Q_C;
+		s_min.R = sensors[i].R;
+		s_min.dT = sensors[i].dT;
+		s_min.sid = sensors[i].sid;
+		s_min.sim = sensors[i].sim;
+
+		sensors_min.push_back(s_min);
+	}
+}
+
+
 vector<vector<vector<DATA>>> SYSTEM::get_data(std::vector<int> s, string filename, int i_repl)
 {
 	// Gets sensor data and organizes the data into a multidimensional vector.
@@ -305,20 +330,15 @@ std::vector<std::vector<DATA>> SYSTEM::read_data(string filename)
 }
 
 
-// void SYSTEM::clear_data()
-// {
-// 	Y.clear();
-// }
-
-
 void SYSTEM::run_estimator(std::vector<int> s)
 {
 	// Uses Pixy sensor data to run an Extended Kalman Filter (EKF) for each marker that contains measurements
 	// 
+	// Inputs:
+	// 		s - [vector<int>] Vector containing the Sensor IDs to run the estimator with
+	// 
 
 	cout << "Running Position Estimator..." << endl;
-
-	// clear_data();
 
 	string filename = "../data/Y_sim__bag1.txt";
 	vector<vector<vector<DATA>>> Y = get_data(s, filename, 13);
@@ -327,10 +347,8 @@ void SYSTEM::run_estimator(std::vector<int> s)
 
 	Y_reorg = reorg_data(Y); // Reorganize the data vector
 
-	cout << "Here" << endl;
 	for(int mid = 0; mid < Y_reorg.size(); mid++)
 	{
-		cout << "Y" << Y_reorg[mid].size() << endl;
 		if(Y_reorg[mid].size() > 0)
 		{
 			cout << "\tEstimating Marker " << mid << "... ";
@@ -354,28 +372,33 @@ void SYSTEM::run_estimator(std::vector<int> s)
 }
 
 
-void SYSTEM::set_sensors_min()
+void SYSTEM::run_estimator_pickup()
 {
-	// Assign the properties of the minimal sensor network
-	// The SENSOR_MIN class is used for bag estimation after calibration has been completed
-	// Objects contain only the necessary data for bag estimation
-	// 
+	// Function to run the estimation algorithm at the pickup location
 
-	SENSOR_MIN s_min;
+	std::vector<int> s;
 
-	for(int i = 0; i < sensors.size(); i++) // For each sensor defined in the network
+	for(int i = 0; i < 5; i++)
 	{
-		s_min.position = sensors[i].position;
-		s_min.point = sensors[i].point;
-		s_min.frame = sensors[i].frame;
-		s_min.Q_C = sensors[i].Q_C;
-		s_min.R = sensors[i].R;
-		s_min.dT = sensors[i].dT;
-		s_min.sid = sensors[i].sid;
-		s_min.sim = sensors[i].sim;
-
-		sensors_min.push_back(s_min);
+		s.push_back(i);
 	}
+
+	run_estimator(s);
+}
+
+
+void SYSTEM::run_estimator_dropoff()
+{
+	// Function to run the estimation algorithm at the pickup location
+
+	std::vector<int> s;
+
+	for(int i = 5; i < 10; i++)
+	{
+		s.push_back(i);
+	}
+
+	run_estimator(s);
 }
 
 

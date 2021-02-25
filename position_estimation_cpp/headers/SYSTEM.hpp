@@ -35,6 +35,8 @@ public:
 	void calibrate_pickup(BAG);
 	void calibrate_dropoff(BAG);
 	void run_estimator(std::vector<int>);
+	void run_estimator_pickup();
+	void run_estimator_dropoff();
 	vector<vector<vector<DATA>>> get_data(std::vector<int>, string, int);
 	// void clear_data();
 
