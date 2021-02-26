@@ -351,7 +351,6 @@ void SYSTEM::run_estimator(std::vector<int> s)
 
 	for(int mid = 0; mid < Y_reorg.size(); mid++)
 	{
-		cout << "mid " << mid << "  Y" << Y_reorg[mid].size() << endl;
 		if(Y_reorg[mid].size() > 0)
 		{
 			cout << "\tEstimating Marker " << mid << "... ";

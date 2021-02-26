@@ -107,6 +107,7 @@ void BAG::estimate_ori()
 	Q = {{matout(0, 0), matout(0, 1), matout(0, 2)},
 		{matout(1, 0), matout(1, 1), matout(1, 2)}, 
 		{matout(2, 0), matout(2, 1), matout(2, 2)}};
+	Q = Q.t();
 
 	std::vector<std::pair<double[3], int>> bag_def = get_bag_pair(true);
 
@@ -114,9 +115,7 @@ void BAG::estimate_ori()
 	for(int i = 0; i < bag_def.size(); i++)
 	{
 		curr = {bag_def[i].first[0], bag_def[i].first[1], bag_def[i].first[2]};
-		// cout << "curr1 " << i << "\n" << curr << endl;
 		curr = Q * curr;
-		// cout << "curr2 " << i << "\n" << curr << endl;
 		bag_def[i].first[0] = curr[0];
 		bag_def[i].first[1] = curr[1];
 		bag_def[i].first[2] = curr[2];

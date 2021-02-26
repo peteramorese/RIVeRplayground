@@ -77,10 +77,6 @@ void MARKER::estimate_pos(vector<vector<DATA>> Y, vector<SENSOR_MIN> sensors, CO
 			updated = true; // Switch flag to indicate the marker has been estimated
 		}
 	}
-	if(updated == true)
-	{
-		cout << "M" << mid << "  " << position[0] << "  " << position[1] << "  " << position[2] << endl;
-	}
 }
 
 
