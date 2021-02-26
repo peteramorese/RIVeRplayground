@@ -5,8 +5,8 @@ int main()
 {
 
 // Default settings
-bool sim = true; // Set run mode to simulation
-bool plot = false; // Set the plot flag
+bool sim = false; // Set run mode to simulation
+vector<bool> plot = {false, true}; // Set the plot flag
 	
 
 bool menu = true;
@@ -42,7 +42,8 @@ while(menu == true)
 				{
 					cout << "Flight" << endl;
 				}
-				cout << "2) Plotting: " << plot << endl;
+				cout << "2) Plotting (Calibration): " << plot[0] << endl;
+				cout << "3) Plotting (Estimation): " << plot[1] << endl;
 				cout << "0) Back to the Menu\n" << endl;
 
 				cin >> set;
@@ -88,11 +89,34 @@ while(menu == true)
 
 						if(plot_flag == 1)
 						{
-							plot = true;
+							plot[0] = true;
 						}
 						else
 						{
-							plot = false;
+							plot[0] = false;
+						}
+
+						break;
+					}
+					case 3 :
+					{
+						int plot_flag;
+
+						cout << "Plotting:" << endl;
+						cout << "1) Display Plots" << endl;
+						cout << "2) Suppress Plots\n" << endl;
+
+						cin >> plot_flag;
+
+						cout << endl;
+
+						if(plot_flag == 1)
+						{
+							plot[1] = true;
+						}
+						else
+						{
+							plot[1] = false;
 						}
 
 						break;
@@ -126,6 +150,8 @@ SYSTEM system(sim, plot);
 
 // Main Menu
 menu = true;
+bool pickup_cal = false;
+bool dropoff_cal = false;
 
 while(menu == true)
 {
@@ -133,8 +159,8 @@ while(menu == true)
 	cout << "-------------------------------------------" << endl;
 	cout << "1) Calibrate Pickup Sensors" << endl;
 	cout << "2) Calibrate Dropoff Sensors" << endl;
-	cout << "3) Scan Pickup" << endl;
-	cout << "4) Scan Dropoff" << endl;
+	if(pickup_cal == true) cout << "3) Scan Pickup" << endl;
+	if(dropoff_cal == true) cout << "4) Scan Dropoff" << endl;
 	cout << "0) Exit\n" << endl;
 
 	cin >> opt;
@@ -146,6 +172,7 @@ while(menu == true)
 		case 1 :
 		{
 			// Initialize a bag to calibrate the sensors containing 3 markers
+			// Marker IDs defined here MUST MATCH THE MARKER IDS OUTPUT BY THE SENSORS
 			BAG calibrator_p(3);
 			calibrator_p.markers[0].position = {0, 0.1, 0.1};
 			calibrator_p.markers[1].position = {0.05, -0.05, 0.1};
@@ -154,11 +181,14 @@ while(menu == true)
 			// Calibrate sensors 0 - 4
 			system.calibrate_pickup(calibrator_p);
 
+			pickup_cal = true;
+
 			break;
 		}
 		case 2 :
 		{
 			// Initialize a bag to calibrate the dropoff sensors
+			// Marker IDs defined here MUST MATCH THE MARKER IDS OUTPUT BY THE SENSORS
 			BAG calibrator_d(6);
 			calibrator_d.markers[3].position = {2.25, 0.85, -0.80};
 			calibrator_d.markers[4].position = {2.50, 0.90, -0.8};
@@ -166,6 +196,8 @@ while(menu == true)
 
 			// Calibrate sensors 5 - 9
 			system.calibrate_dropoff(calibrator_d);	
+
+			dropoff_cal = true;
 
 			break;
 		}

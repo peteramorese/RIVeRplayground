@@ -77,6 +77,10 @@ void MARKER::estimate_pos(vector<vector<DATA>> Y, vector<SENSOR_MIN> sensors, CO
 			updated = true; // Switch flag to indicate the marker has been estimated
 		}
 	}
+	if(updated == true)
+	{
+		cout << "M" << mid << "  " << position[0] << "  " << position[1] << "  " << position[2] << endl;
+	}
 }
 
 
@@ -123,8 +127,8 @@ EKF MARKER::ekf_update(EKF e, vector<SENSOR_MIN> sensors, vector<DATA> y_k, CORE
 			yhat[2*i] = std::get<0>(yhat_tup); // Store yhat in a stacked vector
 			yhat[2*i+1] = std::get<1>(yhat_tup);
 
-			y[2*i] = y_k[sid_valid[i]].x; // Store real measurements in a stacked vector
-			y[2*i+1] = y_k[sid_valid[i]].y;
+			y[2*i] = y_k[i].x; // Store real measurements in a stacked vector
+			y[2*i+1] = y_k[i].y;
 
 			mat H = get_H_tilde(sensors[sid_valid[i]], core);
 			H_tilde = std::move(arma::join_cols(H_tilde, H));
@@ -385,32 +389,33 @@ void MARKER::plot_ekf()
 
 void MARKER::plot_e_y()
 {
-	// Plot the measurement innovations from the EKF
-	
+	// Plot the measurement innovation results from the calibration Extended Kalman Filter
+
 	std::vector<double> x;
 	std::vector<double> y;
-	std::vector<double> z;
 
 	std::vector<double> sigx;
 	std::vector<double> sigy;
-	std::vector<double> sigz;
 
 	for(int i = 1; i < ekf.size(); i++)
 	{
 		x.push_back(ekf[i].e_y(0));
 		y.push_back(ekf[i].e_y(1));
-		z.push_back(ekf[i].e_y(2));
 	}
 
-	plt::figure(1);
+	std::stringstream ttl;
+	ttl << "Measurement Innovation vs Measurement Updates - Marker " << mid << endl;
+
+	plt::figure();
+	plt::suptitle(ttl.str(), {{"fontsize", "20"}});
+	plt::subplot(2, 1, 1);
 	plt::plot(x, "b-");
-	plt::show();
+	plt::ylabel("X Measurement Innovation", {{"fontsize", "16"}});
 
-	plt::figure(2);
+	plt::subplot(2, 1, 2);
 	plt::plot(y, "b-");
+	plt::ylabel("Y Measurement Innovation", {{"fontsize", "16"}});
+	plt::xlabel("No. of Measurement Updates [k]", {{"fontsize", "16"}});
 	plt::show();
 
-	plt::figure(3);
-	plt::plot(z, "b-");
-	plt::show();
 }

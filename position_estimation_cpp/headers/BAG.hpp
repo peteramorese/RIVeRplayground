@@ -27,7 +27,7 @@ public:
 	void estimate_ori();
 
 private:
-	std::vector<std::pair<double[3], int>> get_bag_pair();
+	std::vector<std::pair<double[3], int>> get_bag_pair(bool def);
 	std::vector<std::pair<double[3], int>> get_coords_3D();
 };
 

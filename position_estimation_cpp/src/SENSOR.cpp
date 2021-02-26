@@ -281,12 +281,6 @@ EKF SENSOR::ekf_update(EKF e, BAG bag, std::vector<DATA> y_k, CORE core, CONSTAN
 			y[2*i] = y_k[i].x; // Store real measurements in a stacked vector
 			y[2*i+1] = y_k[i].y;
 
-			// if(sid > 4)
-			// {
-			// 	cout << "yhat = \t" << yhat[2*i] << "\t" << yhat[2*i+1] << endl;
-			// 	cout << "y = \t" << y[2*i] << "\t" << y[2*i+1] << endl;
-			// }
-
 			mat H = get_H_tilde(bag.markers[mid_valid[i]]); 
 			H_tilde = std::move(arma::join_cols(H_tilde, H));
 

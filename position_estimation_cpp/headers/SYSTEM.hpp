@@ -26,9 +26,9 @@ class SYSTEM
 {
 public:
 	bool sim; // Flag defining simulation run mode
-	bool plot = false; // Flag to plot results
+	vector<bool> plot = {false, false}; // Flag to plot results {calibration, estimation}
 
-	SYSTEM(bool s = true, bool p = false);
+	SYSTEM(bool s = true, vector<bool> p = {false, false});
 	~SYSTEM();
 	void set_sim_flag(bool);
 	void assign_bag(BAG);
@@ -52,6 +52,6 @@ private:
 	void init_default_sensors();
 	void calibrate(BAG, std::vector<int> s);
 	vector<vector<DATA>> read_data(string);
-	void set_sensors_min();
+	void set_sensors_min(vector<int>);
 	vector<vector<vector<DATA>>> reorg_data(vector<vector<vector<DATA>>>);
 };

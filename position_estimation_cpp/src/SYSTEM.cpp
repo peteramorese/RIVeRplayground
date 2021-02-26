@@ -5,7 +5,7 @@ using namespace arma;
 using namespace std;
 
 
-SYSTEM::SYSTEM(bool s, bool p)
+SYSTEM::SYSTEM(bool s, vector<bool> p)
 {
 	// Initializes the SYSTEM object
 
@@ -112,7 +112,7 @@ void SYSTEM::calibrate(BAG cal, std::vector<int> s)
 
 		sensors[s[i]].calibrate_sensor(Y[i], cal, core, cnst); // Calibrate Sensor SID
 
-		if(plot == true) // If the plot flag is set to true
+		if(plot[0] == true) // If the plot flag is set to true
 		{
 			sensors[s[i]].plot_ekf(); // Plot the EKF results
 			// sensors[i].plot_e_y();
@@ -121,7 +121,7 @@ void SYSTEM::calibrate(BAG cal, std::vector<int> s)
 		cout << "DONE" << endl;
 	}
 
-	set_sensors_min(); // Assign the minimal sensor object
+	set_sensors_min(s); // Assign the minimal sensor object
 }
 
 
@@ -163,7 +163,7 @@ void SYSTEM::calibrate_dropoff(BAG cal)
 }
 
 
-void SYSTEM::set_sensors_min()
+void SYSTEM::set_sensors_min(vector<int> s)
 {
 	// Assign the properties of the minimal sensor network
 	// The SENSOR_MIN class is used for bag estimation after calibration has been completed
@@ -172,18 +172,20 @@ void SYSTEM::set_sensors_min()
 
 	SENSOR_MIN s_min;
 
-	for(int i = 0; i < sensors.size(); i++) // For each sensor defined in the network
+	for(int i = 0; i < s.size(); i++) // For each sensor defined in the network
 	{
-		s_min.position = sensors[i].position;
-		s_min.point = sensors[i].point;
-		s_min.frame = sensors[i].frame;
-		s_min.Q_C = sensors[i].Q_C;
-		s_min.R = sensors[i].R;
-		s_min.dT = sensors[i].dT;
-		s_min.sid = sensors[i].sid;
-		s_min.sim = sensors[i].sim;
+		s_min.position = sensors[s[i]].position;
+		s_min.point = sensors[s[i]].point;
+		s_min.frame = sensors[s[i]].frame;
+		s_min.Q_C = sensors[s[i]].Q_C;
+		s_min.R = sensors[s[i]].R;
+		s_min.dT = sensors[s[i]].dT;
+		s_min.sid = sensors[s[i]].sid;
+		s_min.sim = sensors[s[i]].sim;
 
 		sensors_min.push_back(s_min);
+
+		cout << "S" << s[i] << "  " << sensors_min[s[i]].position[0] << "  " << sensors_min[s[i]].position[1] << "  " << sensors_min[s[i]].position[2] << endl;
 	}
 }
 
@@ -340,7 +342,7 @@ void SYSTEM::run_estimator(std::vector<int> s)
 
 	cout << "Running Position Estimator..." << endl;
 
-	string filename = "../data/Y_sim__bag1.txt";
+	string filename = "../data/Y_sim__test.txt";
 	vector<vector<vector<DATA>>> Y = get_data(s, filename, 13);
 
 	vector<vector<vector<DATA>>> Y_reorg;
@@ -349,15 +351,17 @@ void SYSTEM::run_estimator(std::vector<int> s)
 
 	for(int mid = 0; mid < Y_reorg.size(); mid++)
 	{
+		cout << "mid " << mid << "  Y" << Y_reorg[mid].size() << endl;
 		if(Y_reorg[mid].size() > 0)
 		{
 			cout << "\tEstimating Marker " << mid << "... ";
 
 			bag.markers[mid].estimate_pos(Y_reorg[mid], sensors_min, core, cnst); // Estimate the position of Marker MID
 
-			if(plot == true) // If the plot flag is set to true
+			if(plot[1] == true && bag.markers[mid].updated == true) // If the plot flag is set to true
 			{
 				bag.markers[mid].plot_ekf(); 
+				// bag.markers[mid].plot_e_y(); 
 			}
 
 			cout << "DONE" << endl;

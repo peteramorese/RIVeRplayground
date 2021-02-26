@@ -90,7 +90,7 @@ void BAG::move_bag(vec x, double r, double p, double y)
 
 void BAG::estimate_ori()
 {
-	std::vector<std::pair<double[3], int>> bag_pair = get_bag_pair();
+	std::vector<std::pair<double[3], int>> bag_pair = get_bag_pair(false);
 
 	oriDetermine od(bag_pair);
 
@@ -100,39 +100,104 @@ void BAG::estimate_ori()
 	matrix<double> matout(3, 3);
 	matout = od.returnQ();
 	matout.print();
+
+	mat Q;
+	vec curr;
+
+	Q = {{matout(0, 0), matout(0, 1), matout(0, 2)},
+		{matout(1, 0), matout(1, 1), matout(1, 2)}, 
+		{matout(2, 0), matout(2, 1), matout(2, 2)}};
+
+	std::vector<std::pair<double[3], int>> bag_def = get_bag_pair(true);
+
+	// Compute the rotated (and centered) positions of each marker
+	for(int i = 0; i < bag_def.size(); i++)
+	{
+		curr = {bag_def[i].first[0], bag_def[i].first[1], bag_def[i].first[2]};
+		// cout << "curr1 " << i << "\n" << curr << endl;
+		curr = Q * curr;
+		// cout << "curr2 " << i << "\n" << curr << endl;
+		bag_def[i].first[0] = curr[0];
+		bag_def[i].first[1] = curr[1];
+		bag_def[i].first[2] = curr[2];
+	}
+
+	// Find the first estimated marker index
+	int Index;
+
+	for(int i = 0; i < markers.size(); i++)
+	{
+		if(markers[i].updated == true)
+		{
+			Index = i;
+			break;
+		}
+	}
+
+	vec move;
+	move = {markers[Index].position[0] - bag_def[Index].first[0], 
+		markers[Index].position[1] - bag_def[Index].first[1],
+		markers[Index].position[2] - bag_def[Index].first[2]};
+
+	for(int i = 0; i < bag_def.size(); i++)
+	{
+		if(markers[i].updated == false)
+		{
+			curr = {bag_def[i].first[0], bag_def[i].first[1], bag_def[i].first[2]};
+
+			markers[i].position = curr + move;
+		}
+
+		cout << "M" << i << "  " << markers[i].position[0] << "  " << markers[i].position[1] << "  " << markers[i].position[2] << endl;
+	}
 }
 
 
-std::vector<std::pair<double[3], int>> BAG::get_bag_pair()
+std::vector<std::pair<double[3], int>> BAG::get_bag_pair(bool def)
 {
+	std::vector<std::pair<double[3], int>> bag_def;
 	std::vector<std::pair<double[3], int>> bag_pair;
-	int Nbagdef = 6;
 
-	bag_pair.resize(Nbagdef);
-	bag_pair[0].first[0] = 0;
-	bag_pair[0].first[1] = 0;
-	bag_pair[0].first[2] = 0.5*height;
-	bag_pair[0].second = 0;
-	bag_pair[1].first[0] = 0;
-	bag_pair[1].first[1] = 0;
-	bag_pair[1].first[2] = -0.5*height;
-	bag_pair[1].second = 1;
-	bag_pair[2].first[0] = 0.5*width;
-	bag_pair[2].first[1] = 0;
-	bag_pair[2].first[2] = 0;
-	bag_pair[2].second = 2;
-	bag_pair[3].first[0] = -0.5*width;
-	bag_pair[3].first[1] = 0;
-	bag_pair[3].first[2] = 0;
-	bag_pair[3].second = 3;
-	bag_pair[4].first[0] = 0;
-	bag_pair[4].first[1] = 0.5*length;
-	bag_pair[4].first[2] = 0;
-	bag_pair[4].second = 4;
-	bag_pair[5].first[0] = 0;
-	bag_pair[5].first[1] = -0.5*length;
-	bag_pair[5].first[2] = 0;
-	bag_pair[5].second = 5;
+	bag_def.resize(6);
+	bag_def[0].first[0] = 0;
+	bag_def[0].first[1] = 0;
+	bag_def[0].first[2] = 0.5*height;
+	bag_def[0].second = 0;
+	bag_def[1].first[0] = 0;
+	bag_def[1].first[1] = 0;
+	bag_def[1].first[2] = -0.5*height;
+	bag_def[1].second = 1;
+	bag_def[2].first[0] = 0.5*width;
+	bag_def[2].first[1] = 0;
+	bag_def[2].first[2] = 0;
+	bag_def[2].second = 2;
+	bag_def[3].first[0] = -0.5*width;
+	bag_def[3].first[1] = 0;
+	bag_def[3].first[2] = 0;
+	bag_def[3].second = 3;
+	bag_def[4].first[0] = 0;
+	bag_def[4].first[1] = 0.5*length;
+	bag_def[4].first[2] = 0;
+	bag_def[4].second = 4;
+	bag_def[5].first[0] = 0;
+	bag_def[5].first[1] = -0.5*length;
+	bag_def[5].first[2] = 0;
+	bag_def[5].second = 5;
+
+	vector<int> mark;
+
+	for(int i = 0; i < markers.size(); i++)
+	{
+		if(markers[i].updated == true || def)
+		{
+			mark.push_back(i);
+		}
+	}
+
+	for(int i = 0; i < mark.size(); i++)
+	{
+		bag_pair.push_back(bag_def[mark[i]]);
+	}
 
 	return bag_pair;
 }
@@ -142,12 +207,14 @@ std::vector<std::pair<double[3], int>> BAG::get_coords_3D()
 {
 	std::vector<std::pair<double[3], int>> coords_3D;
 	int Nmark = 0;
+	vector<int> mark;
 
 	for(int i = 0; i < markers.size(); i++)
 	{
 		if(markers[i].updated == true)
 		{
 			Nmark++;
+			mark.push_back(i);
 		}
 	}
 
@@ -155,10 +222,10 @@ std::vector<std::pair<double[3], int>> BAG::get_coords_3D()
 
 	for(int i = 0; i < Nmark; i++)
 	{
-		coords_3D[i].first[0] = markers[i].position[0];
-		coords_3D[i].first[1] = markers[i].position[1];
-		coords_3D[i].first[2] = markers[i].position[2];
-		coords_3D[i].second = markers[i].mid;
+		coords_3D[i].first[0] = markers[mark[i]].position[0];
+		coords_3D[i].first[1] = markers[mark[i]].position[1];
+		coords_3D[i].first[2] = markers[mark[i]].position[2];
+		coords_3D[i].second = markers[mark[i]].mid;
 	}
 
 	return coords_3D;
