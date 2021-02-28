@@ -6,7 +6,7 @@ int main()
 
 // Default settings
 bool sim = false; // Set run mode to simulation
-vector<bool> plot = {false, true}; // Set the plot flag
+vector<bool> plot = {false, false}; // Set the plot flag
 	
 
 bool menu = true;
