@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/peter/RIVeR_repo/orientation_determination_cpp/include/matrix.cpp
+iostream
+-
+vector
+-
+matrix.h
+/home/peter/RIVeR_repo/orientation_determination_cpp/include/matrix.h
+
+/home/peter/RIVeR_repo/orientation_determination_cpp/include/matrix.h
+vector
+-
+

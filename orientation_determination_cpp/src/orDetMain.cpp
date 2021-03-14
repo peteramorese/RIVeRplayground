@@ -44,33 +44,38 @@ int main() {
 
 	oriDetermine od(bag);	
 	std::vector<std::pair<double[3], int>> coords_3D;
-	coords_3D.resize(Nbagdef);
+	coords_3D.resize(4);
 	coords_3D[0].first[0] = 5.3616586624;
 	coords_3D[0].first[1] = 1.0104812331;
 	coords_3D[0].first[2] = -0.0375358438;
 	coords_3D[0].second = 1;
+	/*
 	coords_3D[1].first[0] =	4.4653518626;
 	coords_3D[1].first[1] = 0.0717397401;
 	coords_3D[1].first[2] = -1.9592845933;
 	coords_3D[1].second = 2;
-	coords_3D[2].first[0] = 4.3231051188;
-	coords_3D[2].first[1] = 0.1058191446;
-	coords_3D[2].first[2] = 0.1957314767;
-	coords_3D[2].second = 3;
-	coords_3D[3].first[0] = 4.6374827331;
-	coords_3D[3].first[1] = -1.2470335490;
-	coords_3D[3].first[2] = -0.0155806898;
-	coords_3D[3].second = 4;
+	*/
+	coords_3D[1].first[0] = 4.3231051188;
+	coords_3D[1].first[1] = 0.1058191446;
+	coords_3D[1].first[2] = 0.1957314767;
+	coords_3D[1].second = 3;
+	coords_3D[2].first[0] = 4.6374827331;
+	coords_3D[2].first[1] = -1.2470335490;
+	coords_3D[2].first[2] = -0.0155806898;
+	coords_3D[2].second = 4;
+	/*
 	coords_3D[4].first[0] = 5.5099273425;
 	coords_3D[4].first[1] = -0.2650047536;
 	coords_3D[4].first[2] = 1.8744393847;
 	coords_3D[4].second = 5;
-	coords_3D[5].first[0] = 5.7227776127;
-	coords_3D[5].first[1] = -0.2848180723;
-	coords_3D[5].first[2] = -0.2852411704;
-	coords_3D[5].second = 6;
+	*/
+	coords_3D[3].first[0] = 5.7227776127;
+	coords_3D[3].first[1] = -0.2848180723;
+	coords_3D[3].first[2] = -0.2852411704;
+	coords_3D[3].second = 6;
 
 	od.setData(coords_3D);
+	od.setIterations(1000);
 	matrix<double> matout(3,3);
 	matout = od.returnQ();
 	matout.print();

@@ -1,0 +1,2 @@
+/usr/bin/ar qc liboriDetermineClass.a  CMakeFiles/oriDetermineClass.dir/oriDetermine.cpp.o
+/usr/bin/ranlib liboriDetermineClass.a

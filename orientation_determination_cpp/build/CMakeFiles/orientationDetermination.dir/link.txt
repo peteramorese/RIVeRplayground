@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/orientationDetermination.dir/src/orDetMain.cpp.o  -o orientationDetermination include/liboriDetermineClass.a include/libmatrixClass.a 
