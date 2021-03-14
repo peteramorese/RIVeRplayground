@@ -1,7 +1,0 @@
-/home/peter/RIVeR_repo/orientation_determination_cpp/build/CMakeFiles/rebuild_cache.dir
-/home/peter/RIVeR_repo/orientation_determination_cpp/build/CMakeFiles/orientationDetermination.dir
-/home/peter/RIVeR_repo/orientation_determination_cpp/build/CMakeFiles/edit_cache.dir
-/home/peter/RIVeR_repo/orientation_determination_cpp/build/include/CMakeFiles/rebuild_cache.dir
-/home/peter/RIVeR_repo/orientation_determination_cpp/build/include/CMakeFiles/edit_cache.dir
-/home/peter/RIVeR_repo/orientation_determination_cpp/build/include/CMakeFiles/oriDetermineClass.dir
-/home/peter/RIVeR_repo/orientation_determination_cpp/build/include/CMakeFiles/matrixClass.dir
