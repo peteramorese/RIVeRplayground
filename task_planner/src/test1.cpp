@@ -1,6 +1,6 @@
 #include "edge.h"
 #include "astar.h"
-
+#include "state.h"
 int main(){			
 	/*
 	Edge test_graph(false);
@@ -35,7 +35,7 @@ int main(){
 		std::cout<<path[i]<<std::endl;
 	}
 	*/
-	
+	/*	
 	Edge graph_1(true);
 	graph_1.connect(0,1,1.0f);
 	Edge graph_2(true);
@@ -47,8 +47,18 @@ int main(){
 	Edge graph_product(true);
 	graph_1.compose(graph_2, graph_product);
 	graph_product.print();
-
-
-
+	*/
+	ObjState ObjectState(3);
+	std::vector<std::string> hello = {"ooga", "booga", "scoobydoo"};
+	std::vector<std::string> objnames = {"thing", "bing", "bong"};
+	ObjectState.setLocationLabels(hello);
+	ObjectState.setObjLabels(objnames);
+	std::vector<int> set_state = {1, 0, State::UNDEF};
+	ObjectState.setState(set_state);
+	std::cout<< ObjectState.isDefined()<<std::endl;
+	ObjectState.printState();
+	std::cout<< " is occ" << ObjectState.isOccupied("scoobydoo")<<std::endl;
+	std::cout<< " is occ" << ObjectState.isOccupied(2)<<std::endl;
+	std::cout<< " is occ" << ObjectState.isOccupied(1)<<std::endl;
 	return 0;
 }

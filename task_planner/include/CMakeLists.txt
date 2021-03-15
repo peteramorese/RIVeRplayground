@@ -1,3 +1,5 @@
-add_library(Edgeclass edge.cpp)
-add_library(Astarclass astar.cpp)
-target_link_libraries(Astarclass Edgeclass)
+add_library(EdgeClass edge.cpp)
+add_library(AstarClass astar.cpp)
+add_library(StateClass state.cpp)
+#add_library(TransitionSystemClass transitionSystem.cpp)
+target_link_libraries(AstarClass EdgeClass)

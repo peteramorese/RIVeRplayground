@@ -14,6 +14,6 @@ class Astar {
 		void setGraph(Edge* e_);
 		void setVInit(unsigned int vinit_);
 		void setVGoal(unsigned int vgoal_);
-		bool search(std::vector<int>& path, float& pathlength);
+		bool searchDijkstra(std::vector<int>& path, float& pathlength);
 
 };
