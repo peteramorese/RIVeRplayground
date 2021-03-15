@@ -49,16 +49,23 @@ int main(){
 	graph_product.print();
 	*/
 	ObjState ObjectState(3);
-	std::vector<std::string> hello = {"ooga", "booga", "scoobydoo"};
+	ObjState ObjectState1(3);
+	std::vector<std::string> hello = {"ooga", "booga", "scoobydoo","safed","safep"};
 	std::vector<std::string> objnames = {"thing", "bing", "bong"};
 	ObjectState.setLocationLabels(hello);
+	ObjectState1.setLocationLabels(hello);
 	ObjectState.setObjLabels(objnames);
+	ObjectState1.setObjLabels(objnames);
 	std::vector<int> set_state = {1, 0, State::UNDEF};
 	ObjectState.setState(set_state);
+	ObjectState1.setState(set_state);
 	std::cout<< ObjectState.isDefined()<<std::endl;
 	ObjectState.printState();
-	std::cout<< " is occ" << ObjectState.isOccupied("scoobydoo")<<std::endl;
-	std::cout<< " is occ" << ObjectState.isOccupied(2)<<std::endl;
-	std::cout<< " is occ" << ObjectState.isOccupied(1)<<std::endl;
+
+	EEState EefState;
+	EefState.setEELocation("safed");
+	std::cout<< EefState.returnEELocationLabel()<<std::endl;
+	std::cout<<"iseq " << ObjectState.isEqual(ObjectState1)<<std::endl;
+
 	return 0;
 }

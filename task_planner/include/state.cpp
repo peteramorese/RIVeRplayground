@@ -81,6 +81,9 @@ void EEState::setEELocation(int location_label_ind) {
 	state_space[0] = location_label_ind;
 }
 
+bool EEState::isEqual(const EEState &compare_state) const {
+	return (state_space == compare_state.getState());
+}
 
 /* ObjState CLASS DEFINITION */
 
@@ -164,5 +167,9 @@ void ObjState::printState() const {
 			std::cout<<"Object: "<<obj_labels[i]<<"   is in location: "<<location_labels[state_space[i]]<<"\n";
 		}
 	}
+}
+
+bool ObjState::isEqual(const ObjState &compare_state) const {
+	return (state_space == compare_state.getState());
 }
 

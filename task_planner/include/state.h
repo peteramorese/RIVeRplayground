@@ -14,9 +14,7 @@ class State {
 		int label2ind(std::string label, const std::vector<std::string>& labels) const;
 	public:
 		static const int UNDEF;
-		//const int UNDEF = -1;
 		const std::string UNDEF_label = "UNDEF";
-
 		void setLocationLabels(std::vector<std::string> location_labels_);
 		bool isDefined() const;
 		void setState(std::vector<int> state_);
@@ -35,7 +33,7 @@ class EEState : public State {
 		int returnEELocation() const;
 		void setEELocation(std::string location_label);
 		void setEELocation(int location_label_ind);
-
+		bool isEqual(const EEState &compare_state) const;
 };
 
 #endif
@@ -57,6 +55,7 @@ class ObjState : public State {
 		bool isOccupied(std::string location_label) const;
 		bool isOccupied(int location_label_ind) const;
 		void printState() const;
+		bool isEqual(const ObjState &compare_state) const;
 };
 				
 #endif
