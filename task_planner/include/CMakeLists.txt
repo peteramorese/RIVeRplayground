@@ -1,5 +1,7 @@
 add_library(EdgeClass edge.cpp)
 add_library(AstarClass astar.cpp)
 add_library(StateClass state.cpp)
-#add_library(TransitionSystemClass transitionSystem.cpp)
+add_library(TransitionSystemClass transitionSystem.cpp)
 target_link_libraries(AstarClass EdgeClass)
+target_link_libraries(TransitionSystemClass EdgeClass)
+target_link_libraries(TransitionSystemClass StateClass)

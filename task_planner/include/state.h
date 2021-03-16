@@ -15,25 +15,14 @@ class State {
 	public:
 		static const int UNDEF;
 		const std::string UNDEF_label = "UNDEF";
-		void setLocationLabels(std::vector<std::string> location_labels_);
+		void setLocationLabels(const std::vector<std::string>& location_labels_);
+		int returnNumLocations() const;
+		std::string returnLocationLabel(int location_label_ind);
 		bool isDefined() const;
 		void setState(std::vector<int> state_);
 		std::vector<int> getState() const;
-};
-
-#endif
-
-#ifndef EESTATE_H
-#define EESTATE_H
-
-class EEState : public State {
-	public:
-		EEState();
-		std::string returnEELocationLabel() const;
-		int returnEELocation() const;
-		void setEELocation(std::string location_label);
-		void setEELocation(int location_label_ind);
-		bool isEqual(const EEState &compare_state) const;
+		void copyTo(State* copy_state) const;
+		void copyFrom(const State* copy_state);
 };
 
 #endif
@@ -41,13 +30,19 @@ class EEState : public State {
 #ifndef OBJSTATE_H
 #define OBJSTATE_H
 
-class ObjState : public State {
+class ManipulatorState : public State {
 	private:
-		const unsigned int N_tuple;
-		std::vector<std::string> obj_labels;
+		static unsigned int N_obj;
+		static std::vector<std::string> obj_labels;
 	public: 
-		ObjState(unsigned int N_tuple_);
-		void setObjLabels(std::vector<std::string> obj_labels_);
+		std::string returnEELocationLabel() const;
+		int returnEELocation() const;
+		bool isGrabbing(std::string eef_flag);
+		bool isGrabbing(std::string eef_flag, int& grabbing_obj_ind);
+		void setEELocation(std::string location_label);
+		void setEELocation(int location_label_ind);
+		void setObjLocationToEELocation(int obj_label_ind);
+		void setObjLabels(const std::vector<std::string>& obj_labels_);
 		std::string returnObjLocation(std::string obj_label) const;
 		int returnObjLocation(int obj_label_ind) const;
 		void setObjLocation(std::string obj_label, std::string location_label);
@@ -55,7 +50,7 @@ class ObjState : public State {
 		bool isOccupied(std::string location_label) const;
 		bool isOccupied(int location_label_ind) const;
 		void printState() const;
-		bool isEqual(const ObjState &compare_state) const;
+		bool isEqual(const ManipulatorState* compare_state_ptr) const;
 };
 				
 #endif

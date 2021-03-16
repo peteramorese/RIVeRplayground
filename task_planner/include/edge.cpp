@@ -30,7 +30,7 @@ bool Edge::isListEmpty(Edge::edgelist* head_) const {
 	}
 }
 
-void Edge::append(unsigned int nodeind_, float weight_) {
+void Edge::append(unsigned int nodeind_, float weight_, int label_) {
 	if (isEmpty()) {
 		Edge::edgelist* newNode = new Edge::edgelist;
 		//std::cout<<"PTR: "<<newNode<<std::endl;
@@ -41,6 +41,7 @@ void Edge::append(unsigned int nodeind_, float weight_) {
 		   }
 		   */
 		newNode->weight = 0; 
+		newNode->label = -1; 
 		head = newNode;
 		heads[ind_checkout] = head;
 		prev = newNode;
@@ -51,6 +52,7 @@ void Edge::append(unsigned int nodeind_, float weight_) {
 		//std::cout<<"PTR: "<<newNode<<std::endl;
 		newNode->nodeind = nodeind_;
 		newNode->weight = weight_;
+		newNode->label = label_;
 
 		prev->adjptr = newNode;
 		prev = newNode;
@@ -125,7 +127,7 @@ const std::vector<Edge::edgelist*> Edge::getHeads() const {
 
 }
 
-void Edge::connect(unsigned int ind_from, unsigned int ind_to, float weight_){
+void Edge::connect(unsigned int ind_from, unsigned int ind_to, float weight_, int label_){
 	// Add lists until ind_from and ind_to are included in the graph
 	while (ind_from > ind){
 		newlist();	
@@ -134,10 +136,16 @@ void Edge::connect(unsigned int ind_from, unsigned int ind_to, float weight_){
 		newlist();
 	}
 	checkout(ind_from);
-	append(ind_to, weight_);
+	if (isEmpty()){
+		append(ind_from, 0, 0);
+	}
+	append(ind_to, weight_, label_);
 	if (!ordered){
 		checkout(ind_to);
-		append(ind_from, weight_);
+		if (isEmpty()){
+			append(ind_to, 0, 0);
+		}
+		append(ind_from, weight_, label_);
 	}
 
 }
@@ -165,10 +173,12 @@ std::vector<float> Edge::returnListWeights(unsigned int ind_) const {
 void Edge::print() const {
 	for (int i=0; i<heads.size(); i++) {
 		auto currptr = heads[i];
-		std::cout<<"Node: "<<i<<" connects to:\n";
+		std::cout<<"Node: "<<currptr->nodeind<<" connects to:\n";
+		currptr = currptr->adjptr;
 		while (currptr!=nullptr) {
 			auto nextptr = currptr->adjptr;
-			std::cout<<"  ~> "<<currptr->nodeind<<"\n";
+			std::cout<<"  ~> "<<currptr->nodeind<<"     with label: "<<currptr->label<<"     and weight: "<<currptr->weight<<"\n";
+			
 			currptr = nextptr;
 		}
 	}
@@ -203,12 +213,17 @@ void Edge::compose(const Edge &mult_graph, Edge& product_graph){
 					int j_to = currptr_j->nodeind;
 					ind_to = augmentedStateFunc(i_to, j_to, n, m);
 
-					// Edge weights on composed graph is just the sum of the
+					// Edge weights on composed graph are just the sum of the
 					// corresponding edge weights. This line below can be
 					// changed if the composition edge weight operator is
 					// defined to be something else
 					float prod_weight = currptr_i->weight + currptr_j->weight;
-					product_graph.connect(ind_from, ind_to, prod_weight);
+					
+					// Edge labels on composed are just the edge labels of the
+					// "this" graph. This line below can be edited if the 
+					// composition labeling rules needs to be customized/changed
+					unsigned int prod_label = currptr_i->label;
+					product_graph.connect(ind_from, ind_to, prod_weight, prod_label);
 					currptr_j = currptr_j->adjptr;
 				}
 				currptr_i = currptr_i->adjptr;

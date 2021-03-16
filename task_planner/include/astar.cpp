@@ -15,7 +15,7 @@ void Astar::setGraph(Edge* e_) {
 }
 
 void Astar::setVInit(unsigned int vinit_){
-	if (vinit_-1>Nv){
+	if (vinit_>Nv-1){
 		std::cout<<"Error: vinit index is larger than any node index"<<std::endl;
 	} else {
 		vinit = vinit_;	
@@ -24,7 +24,7 @@ void Astar::setVInit(unsigned int vinit_){
 }
 
 void Astar::setVGoal(unsigned int vgoal_){
-	if (vgoal_-1>Nv){
+	if (vgoal_>Nv-1){
 		std::cout<<"Error: vgoal index is larger than any node index"<<std::endl;
 	} else {
 		vgoal = vgoal_;	

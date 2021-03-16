@@ -1,26 +1,27 @@
 #include "edge.h"
 #include "astar.h"
 #include "state.h"
+#include "transitionSystem.h"
 int main(){			
 	/*
 	Edge test_graph(false);
 	Edge* test_graph_ptr = &test_graph;
-	test_graph.connect(0, 1, 1.0f);
-	test_graph.connect(0, 2, 1.0f);
-	test_graph.connect(0, 3, 1.0f);
-	test_graph.connect(1, 4, 1.0f);
-	test_graph.connect(1, 5, 1.0f);
-	test_graph.connect(1, 6, 3.0f);
-	test_graph.connect(2, 7, 4.0f);
-	test_graph.connect(2, 8, 1.0f);
-	test_graph.connect(2, 9, 2.0f);
-	test_graph.connect(3, 10, 1.0f);
-	test_graph.connect(3, 11, 1.0f);
-	test_graph.connect(3, 12, 1.0f);
-	test_graph.connect(5, 13, 3.0f);
-	test_graph.connect(7, 13, 3.0f);
-	test_graph.connect(9, 13, 3.0f);
-	test_graph.connect(11, 13, 2.0f);
+	test_graph.connect(0, 1, 1.0f, 1);
+	test_graph.connect(0, 2, 1.0f, 1);
+	test_graph.connect(0, 3, 1.0f, 1);
+	test_graph.connect(1, 4, 1.0f, 1);
+	test_graph.connect(1, 5, 1.0f, 1);
+	test_graph.connect(1, 6, 3.0f, 1);
+	test_graph.connect(2, 7, 4.0f, 1);
+	test_graph.connect(2, 8, 1.0f, 1);
+	test_graph.connect(2, 9, 2.0f, 1);
+	test_graph.connect(3, 10, 1.0f, 1);
+	test_graph.connect(3, 11, 1.0f, 1);
+	test_graph.connect(3, 12, 1.0f, 1);
+	test_graph.connect(5, 13, 3.0f, 1);
+	test_graph.connect(7, 13, 3.0f, 1);
+	test_graph.connect(9, 13, 3.0f, 1);
+	test_graph.connect(11, 13, 2.0f, 1);
 
 	test_graph.print();
 	
@@ -47,25 +48,30 @@ int main(){
 	Edge graph_product(true);
 	graph_1.compose(graph_2, graph_product);
 	graph_product.print();
+
 	*/
-	ObjState ObjectState(3);
-	ObjState ObjectState1(3);
+	/*
+	ManipulatorState ObjectState;
+	ManipulatorState ObjectState1;
 	std::vector<std::string> hello = {"ooga", "booga", "scoobydoo","safed","safep"};
 	std::vector<std::string> objnames = {"thing", "bing", "bong"};
 	ObjectState.setLocationLabels(hello);
 	ObjectState1.setLocationLabels(hello);
 	ObjectState.setObjLabels(objnames);
 	ObjectState1.setObjLabels(objnames);
-	std::vector<int> set_state = {1, 0, State::UNDEF};
+	std::vector<int> set_state = {3, 1, 0, State::UNDEF};
 	ObjectState.setState(set_state);
 	ObjectState1.setState(set_state);
 	std::cout<< ObjectState.isDefined()<<std::endl;
 	ObjectState.printState();
 
-	EEState EefState;
-	EefState.setEELocation("safed");
-	std::cout<< EefState.returnEELocationLabel()<<std::endl;
-	std::cout<<"iseq " << ObjectState.isEqual(ObjectState1)<<std::endl;
+	std::cout<<"isgrab " << ObjectState.isGrabbing("ooga")<<std::endl;
+	*/
+	TransitionSystem computerDedLmao;
+	Edge TS(true);
+	Edge* TS_ptr = &TS;
+	computerDedLmao.generateRiver(TS_ptr);
+	TS_ptr->print();
 
 	return 0;
 }
