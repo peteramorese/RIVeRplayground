@@ -24,6 +24,7 @@ class State {
 		void initNewSS();
 		static const std::string UNDEF;
 		static void setStateDimension(const std::vector<std::string>& var_labels, unsigned int dim);
+		static void generateAllPossibleStates(std::vector<State>& all_states) ;
 		static int getVarOptionsCount(unsigned int dim);
 		static void setStateDimensionLabel(unsigned int dim, std::string dimension_label);
 		static void setDomain(std::string domain_label, std::vector<std::string> vars);
@@ -31,14 +32,18 @@ class State {
 		static bool getDomains(std::string var, std::vector<std::string>& in_domains);
 		static void setLabelGroup(std::string group_label, std::vector<std::string> dimension_labels);
 		static void setLabelGroup(std::string group_label, std::vector<std::string> dimension_labels, unsigned int index);
-		bool argFindGroup(std::string var_find, std::string group_label, std::string& arg_dimension_label); 
-		virtual void setState(const std::vector<std::string>& set_state);
-		virtual void setState(std::string set_state_var, unsigned int dim);
-		std::vector<std::string> getState();
-		std::string getVar(std::string dimension_label);
+		bool argFindGroup(std::string var_find, std::string group_label, std::string& arg_dimension_label) const; 
+		void setState(const std::vector<std::string>& set_state);
+		void setState(std::string set_state_var, unsigned int dim);
+		std::vector<std::string> getState() const;
+		std::string getVar(std::string dimension_label) const;
 		bool isDefined() const;
 		void print() const;
+		bool exclEquals(const State* state_ptr_, const std::vector<std::string>& excl_dimension_labels) const;
+		bool operator== (const State& state_) const;
+		bool operator== (const State* state_ptr_) const;
 		void operator= (const State& state_eq);
+		void operator= (const State* state_eq_ptr);
 };
 
 #endif
@@ -47,9 +52,14 @@ class State {
 #define BLOCKINGSTATE_H
 
 class BlockingState : public State {
+	private:
+		static std::vector<bool> blocking_dims;
 	public:
-		void setState(const std::vector<std::string>& set_state);
-		void setState(std::string set_state_var, unsigned int dim);
+		static void setBlockingDim(const std::vector<bool>& blocking_dims_);
+		static void setBlockingDim(bool blocking, unsigned int dim);
+		static void generateAllPossibleStates(std::vector<BlockingState>& all_states) ;
+		bool setState(const std::vector<std::string>& set_state);
+		bool setState(std::string set_state_var, unsigned int dim);
 };
 
 #endif

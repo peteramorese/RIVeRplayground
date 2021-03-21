@@ -51,6 +51,36 @@ void State::setStateDimension(const std::vector<std::string>& var_labels, unsign
 	num_vars[dim] = set_labels.size();
 }
 
+void State::generateAllPossibleStates(std::vector<State>& all_states) {
+	int counter = 1;
+	// Count the number of possible states using a permutation. Omit the last element in each
+	// state_space_named array because it represents UNDEF
+	std::vector<int> column_wrapper(state_space_dim);
+	std::vector<int> digits(state_space_dim);
+	for (int i=0; i<state_space_dim; i++){
+		int inds = state_space_named[i].size() - 1;
+		counter *= inds;
+		std::cout<<inds<<std::endl;
+		column_wrapper[i] = inds;
+		digits[i] = 0;
+	}
+	all_states.resize(counter);
+	int a = 0;
+	int b = 0;
+	for (int i=0; i<counter; i++) {
+		for (int ii=0; ii<state_space_dim; ii++){
+			all_states[i].setState(state_space_named[ii][digits[ii]],ii);
+		}
+		digits[0]++;
+		for (int ii=0; ii<state_space_dim; ii++){
+			if (digits[ii] > column_wrapper[ii]-1) {
+				digits[ii] = 0;
+				digits[ii+1]++;
+			}
+		}
+	}
+}
+
 int State::getVarOptionsCount(unsigned int dim) {
 	if (dim < state_space_dim){
 		return state_space_named[dim].size();
@@ -135,7 +165,7 @@ bool State::getDomains(std::string var, std::vector<std::string>& in_domains) {
 	bool found = false;
 	for (int i=0; i<domains.size(); i++){
 		for (int ii=0; ii<domains[i].vars.size(); ii++) {
-			if (var == domains[i].vars[i]){
+			if (var == domains[i].vars[ii]){
 				in_domains.push_back(domains[i].label);
 				found = true;
 			}
@@ -162,17 +192,17 @@ void State::setLabelGroup(std::string group_label, std::vector<std::string> dime
 	groups[index] = add_group;
 }
 
-bool State::argFindGroup(std::string var_find, std::string group_label, std::string& arg_dimension_label) {
+bool State::argFindGroup(std::string var_find, std::string group_label, std::string& arg_dimension_label) const {
 	bool is_found = false;
 	arg_dimension_label = "NOT FOUND";
 	for (int i=0; i<groups.size(); i++) {
 		if (groups[i].label == group_label) {
 			for (int ii=0; ii<groups[i].vars.size(); ii++){
-				std::string dim_label = groups[i].vars[i];
+				std::string dim_label = groups[i].vars[ii];
 				int ind;
 				ind = index_labels[dim_label];
 				if (state_space_named[ind][state_space[ind]] == var_find) {
-					is_found = false;
+					is_found = true;
 					arg_dimension_label = dim_label;
 					break;
 				}
@@ -223,7 +253,7 @@ void State::setState(std::string set_state_var, unsigned int dim) {
 	}
 }
 
-std::vector<std::string> State::getState() {
+std::vector<std::string> State::getState() const {
 	std::vector<std::string> ret_state;
 	for (int i=0; i<state_space_dim; i++){
 		ret_state[i] = state_space_named[i][state_space[i]];
@@ -231,7 +261,7 @@ std::vector<std::string> State::getState() {
 	return ret_state;
 }
 
-std::string State::getVar(std::string dimension_label) {
+std::string State::getVar(std::string dimension_label) const {
 	unsigned int ind = index_labels[dimension_label];
 	int named_ind = state_space[ind];
        	return state_space_named[ind][named_ind];
@@ -255,23 +285,72 @@ void State::print() const {
 	}
 }
 
+bool State::exclEquals(const State* state_ptr_, const std::vector<std::string>& excl_dimension_labels) const {
+	bool ret_bool = true;
+	std::vector<bool> check(state_space_dim);
+	for (int i=0; i<state_space_dim; i++) {
+		check[i] = true;
+	}
+	for (int i=0; i<excl_dimension_labels.size(); i++){
+		int ind = index_labels[excl_dimension_labels[i]];
+		check[ind] = false;
+	}
+	for (int i=0; i<state_space_dim; i++){
+		if (check[i]) {
+			if (state_space[i] != state_ptr_->state_space[i]) {
+				ret_bool = false;
+				break; 
+			}	
+		}
+	}
+	return ret_bool;
+}
+
+bool State::operator== (const State& state_) const {
+	return (state_space == state_.state_space);
+}
+
+bool State::operator== (const State* state_ptr_) const {
+	return (state_space == state_ptr_->state_space);
+}
+
 void State::operator= (const State& state_eq) {
 	state_space = state_eq.state_space;
 }
 
+void State::operator= (const State* state_eq_ptr) {
+	state_space = state_eq_ptr->state_space;
+}
+
 /* BlockingState DEFINTION */
 
-void BlockingState::setState(const std::vector<std::string>& set_state) {
+std::vector<bool> BlockingState::blocking_dims;
+
+void BlockingState::setBlockingDim(const std::vector<bool>& blocking_dims_) {
+	blocking_dims = blocking_dims_;
+}
+
+void BlockingState::setBlockingDim(bool blocking, unsigned int dim) {
+	if (dim < state_space_dim){
+		blocking_dims[dim] = blocking;
+	} else {
+		std::cout<<"Error: Dimension index out of bounds\n";
+	}
+}
+
+bool BlockingState::setState(const std::vector<std::string>& set_state) {
 	if (set_state.size() == state_space_dim){
 		bool conflict = false;
 		bool names_found = true;
 		if (set_state.size() > 1){
 			for (int i=0; i<set_state.size()-1; i++) {
-				for (int ii=i+1; ii<set_state.size(); ii++) {
-					if (set_state[i] == set_state[ii]) {
-						std::cout<<"Error: Cannot set Blocking State, duplication location: "<<set_state[i]<<"\n";
-						conflict = true;
-						goto blocking;
+				if (blocking_dims[i]) {
+					for (int ii=i+1; ii<set_state.size(); ii++) {
+						if (set_state[i] == set_state[ii]) {
+							std::cout<<"Warning: Cannot set Blocking State, duplication location: "<<set_state[i]<<"\n";
+							conflict = true;
+							goto blocking;
+						}
 					}
 				}
 			}
@@ -292,9 +371,12 @@ void BlockingState::setState(const std::vector<std::string>& set_state) {
 		}	
 		if (!names_found) {
 			std::cout<<"Error: Unrecognized label in set state\n";
+		} else {
+			return true;
 		}
 blocking:
 		if (conflict) {
+			return false;
 			std::cout<<"  Set state will not be set...\n";
 		}
 	} else {
@@ -302,17 +384,19 @@ blocking:
 	}
 }
 
-void BlockingState::setState(std::string set_state_var, unsigned int dim) {
+bool BlockingState::setState(std::string set_state_var, unsigned int dim) {
 	bool name_found = false;
 	if (dim+1 > state_space_dim) {
 		std::cout<<"Error: Dimension out of bounds\n";
 	} else {
 		bool conflict = false;
 		for (int i=0; i<state_space_dim; i++) {
-			if (state_space_named[i][state_space[i]] == set_state_var) {
-				std::cout<<"Error: Cannot set Blocking State, duplication location: "<<set_state_var<<"\n";
-				conflict = true;
-				goto blocking;
+			if (blocking_dims[i]) {
+				if (state_space_named[i][state_space[i]] == set_state_var) {
+					std::cout<<"Warning: Cannot set Blocking State, duplication location: "<<set_state_var<<"\n";
+					conflict = true;
+					goto blocking;
+				}
 			}
 		}
 		for (int i=0; i<num_vars[i]; i++){
@@ -321,213 +405,66 @@ void BlockingState::setState(std::string set_state_var, unsigned int dim) {
 				state_space[dim] = i;
 			}
 		}
+		if (!name_found) {
+			std::cout<<"Error: Unrecognized label in set state\n";
+		} else {
+			return true;
+		}
 blocking:
 		if (conflict) {
+			return false;
 			std::cout<<"  Set state will not be set...\n";
 		}
 
 	}
 }
 
-
-
-
-
-
-
-/*
-   std::vector<std::string> State::location_labels;
-   const int State::UNDEF = -1;
-   bool State::labels_set;
-
-   int State::label2ind(std::string label, const std::vector<std::string>& labels) const {
-   int ind = -1;
-   for (int i=0; i<labels.size(); i++){
-   if (labels[i] == label){
-   ind = i;
-   break;
-   }
-   }
-   if (ind != -1){
-   return ind;
-   } else {
-   std::cout<<"Error: label does not match any in labels set\n";
-   }
-   }
-
-   void State::setLocationLabels(const std::vector<std::string>& location_labels_) {
-   location_labels = location_labels_;
-   labels_set = true;
-   }
-
-   int State::returnNumLocations() const {
-   return location_labels.size();
-   }
-
-   std::string State::returnLocationLabel(int location_label_ind){
-   return location_labels[location_label_ind];
-   }
-
-   bool State::isDefined() const {
-   bool ret_bool = true;
-   for (int i=0; i<state_space.size(); i++){
-   if (state_space[i] == UNDEF){
-   ret_bool = false;
-   break;
-   }		
-   }
-   return ret_bool;
-   }
-
-   void State::setState(std::vector<int> state_){
-   if (labels_set){
-   state_space = state_;
-   } else {
-   std::cout<<"Error: Set location labels before setting state\n";
-   }
-   }
-
-   std::vector<int> State::getState() const {
-   return state_space;
-   }
-
-   void State::copyTo(State* copy_state) const {
-   copy_state->setState(state_space);
-   }
-
-   void State::copyFrom(const State* copy_state) {
-   state_space = copy_state->getState();
-   }
-
-
-// Position 0 in the state space is reserved for the end effector, whereas all
-// positions 1, 2, 3,... represent object 0, 1, 2,...
-
-unsigned int ManipulatorState::N_obj;
-std::vector<std::string> ManipulatorState::obj_labels;
-
-std::string ManipulatorState::returnEELocationLabel() const {
-	return location_labels[state_space[0]];
-}
-
-bool ManipulatorState::isGrabbing(std::string eef_flag) {
-	bool ret_bool = false;
-	for (int i=1; i<state_space.size(); i++){
-		if (location_labels[state_space[i]] == eef_flag) {
-			ret_bool = true;
-			break;
+void BlockingState::generateAllPossibleStates(std::vector<BlockingState>& all_states) {
+	int counter = 1;
+	// Count the number of possible states using a permutation. Omit the last element in each
+	// state_space_named array because it represents UNDEF
+	std::vector<int> column_wrapper(state_space_dim);
+	std::vector<int> digits(state_space_dim);
+	for (int i=0; i<state_space_dim; i++){
+		int inds = state_space_named[i].size() - 1;
+		counter *= inds;
+		std::cout<<inds<<std::endl;
+		column_wrapper[i] = inds;
+		digits[i] = 0;
+	}
+	all_states.resize(counter);
+	int i = 0;
+	int j = 0;
+	while (i<counter) {
+		bool non_blocking = true;
+		for (int ii=0; ii<state_space_dim; ii++){
+			bool non_blocking_i = all_states[j].setState(state_space_named[ii][digits[ii]],ii);
+			non_blocking = non_blocking && non_blocking_i;
+			if (!non_blocking) {
+				break;
+			}
 		}
-	}
-	return ret_bool;
-}
-
-bool ManipulatorState::isGrabbing(std::string eef_flag, int& grabbing_obj_ind) {
-	bool ret_bool = false;
-	grabbing_obj_ind = -1;
-	for (int i=1; i<state_space.size(); i++){
-		if (location_labels[state_space[i]] == eef_flag) {
-			grabbing_obj_ind = i - 1;
-			ret_bool = true;
-			break;
-		}
-	}
-	return ret_bool;
-}
-
-int ManipulatorState::returnEELocation() const {
-	return state_space[0];
-}
-
-void ManipulatorState::setEELocation(std::string location_label) {
-	int ind = label2ind(location_label, location_labels);
-	state_space[0] = ind;
-}
-
-void ManipulatorState::setEELocation(int location_label_ind) {
-	state_space[0] = location_label_ind;
-}
-
-void ManipulatorState::setObjLocationToEELocation(int obj_label_ind) {
-	state_space[obj_label_ind] = state_space[0];
-}
-
-void ManipulatorState::setObjLabels(const std::vector<std::string>& obj_labels_) {
-	N_obj = obj_labels_.size();
-	state_space.resize(N_obj+1);	
-	obj_labels = obj_labels_;
-}
-
-
-std::string ManipulatorState::returnObjLocation(std::string obj_label) const {
-	std::string ret_string;
-	int obj_label_ind = label2ind(obj_label, obj_labels);
-	if (state_space[obj_label_ind+1] != UNDEF){
-		ret_string = location_labels[state_space[obj_label_ind+1]];
-	} else {
-		ret_string = UNDEF_label;	
-	}
-	return ret_string;
-}
-
-int ManipulatorState::returnObjLocation(int obj_label_ind) const {
-	if (obj_label_ind < 0 || obj_label_ind > obj_labels.size()){
-		std::cout<<"Error: Obj Label Index out of bounds\n";
-	} else {
-		if (state_space[obj_label_ind+1] == UNDEF){
-			return UNDEF;
+		if (non_blocking) {
+			i++;
+			j++;
 		} else {
-			return state_space[obj_label_ind+1];
+			i++;
+		}
+		std::cout<<"i: "<<i<<" j: "<<j<<std::endl;
+		digits[0]++;
+		for (int ii=0; ii<state_space_dim; ii++){
+			if (digits[ii] > column_wrapper[ii]-1) {
+				digits[ii] = 0;
+				if (ii != state_space_dim-1) {
+					digits[ii+1]++;
+				} else {
+					goto loopexit;
+				}
+			}
 		}
 	}
+loopexit:
+	all_states.resize(j+1);
+	std::cout<<"Info: Generated "<<j<<" blocking states out of "<<counter<<" possible states\n";
 }
 
-void ManipulatorState::setObjLocation(std::string obj_label, std::string location_label){
-	int obj_label_ind = label2ind(obj_label, obj_labels);
-	int location_label_ind = label2ind(location_label, location_labels);
-	state_space[obj_label_ind+1] = location_label_ind;
-}
-
-void ManipulatorState::setObjLocation(int obj_label_ind, int location_label_ind){
-	state_space[obj_label_ind+1] = location_label_ind;
-}
-
-bool ManipulatorState::isOccupied(std::string location_label) const {
-	int location_label_ind = label2ind(location_label, location_labels);
-	bool ret_bool = false;
-	for (int i=1; i<state_space.size(); i++){
-		if (state_space[i] == location_label_ind) {
-			ret_bool = true;
-			break;
-		}
-	}
-	return ret_bool;
-}
-
-bool ManipulatorState::isOccupied(int location_label_ind) const {
-	bool ret_bool = false;
-	for (int i=1; i<state_space.size(); i++){
-		if (state_space[i] == location_label_ind) {
-			ret_bool = true;
-			break;
-		}
-	}
-	return ret_bool;
-}
-
-
-void ManipulatorState::printState() const {
-	std::cout<<"End Effector is in location: "<<location_labels[state_space[0]]<<"\n";
-	for (int i=1; i<state_space.size(); i++){
-		if (state_space[i]==UNDEF){
-			std::cout<<"Object: "<<obj_labels[i-1]<<"   has no location defined\n"; 
-		} else {
-			std::cout<<"Object: "<<obj_labels[i-1]<<"   is in location: "<<location_labels[state_space[i]]<<"\n";
-		}
-	}
-}
-
-bool ManipulatorState::isEqual(const ManipulatorState* compare_state_ptr) const {
-	return (state_space == compare_state_ptr->getState());
-}
-
-*/

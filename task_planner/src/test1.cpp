@@ -1,6 +1,7 @@
 #include "edge.h"
 #include "astar.h"
 #include "state.h"
+#include "condition.h"
 //#include "transitionSystem.h"
 int main(){			
 	/*
@@ -54,46 +55,62 @@ int main(){
 
 	std::cout<<"isgrab " << ObjectState.isGrabbing("ooga")<<std::endl;
 	*/
-	std::vector<std::string> var_labels_1 = {"Ooga", "Booga", "Boogie", "Boo"};
-	std::vector<std::string> var_labels_2 = {"tall", "small"};
+	std::vector<std::string> var_labels_1 = {"safep", "L1", "L2", "L3"};
+	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2", "L3"};
+	std::vector<std::string> var_labels_3 = {"true", "false"};
+	std::vector<std::string> domain_pickup = {"L1", "L2"};
+	std::vector<std::string> domain_dropoff = {"L3"};
+	
 	State::setStateDimension(var_labels_1, 0);
-	State::setStateDimension(var_labels_1, 1);
+	State::setStateDimension(var_labels_2, 1);
 	State::setStateDimension(var_labels_2, 2);
-	std::vector<std::string> set_state = {"Ooga", "Boo", "small"};
-	State test_state;
-	test_state.setState(set_state);
-	test_state.print();
-
-
-	BlockingState block_state;
-	//block_state.initNewSS();
-	std::vector<std::string> set_state_block = {"Ooga", "Booga", "small"};
-	block_state.setState(set_state_block);	
-	block_state.setState("Boogie", 1);
-	std::vector<std::string> oogas_domain = {"Ooga", "Booga", "Boogie"};
-	std::vector<std::string> other_domain = {"Boo", "tall", "small"};
-	State::setDomain("the oogas", oogas_domain);
-	State::setDomain("the others", other_domain);
+	State::setStateDimension(var_labels_2, 3);
+	State::setStateDimension(var_labels_3, 4);
+	State::setDomain("pickup domain", domain_pickup);
+	State::setDomain("dropoff domain", domain_dropoff);
 	State::setStateDimensionLabel(0, "eeLoc");
 	State::setStateDimensionLabel(1, "obj1Loc");
-	State::setStateDimensionLabel(1, "obj2Loc");
-	std::vector<std::string> grouperino = {"obj1Loc", "obj2Loc"};
+	State::setStateDimensionLabel(2, "obj2Loc");
+	State::setStateDimensionLabel(3, "obj3Loc");
+	State::setStateDimensionLabel(4, "holding");
+	std::vector<std::string> grouperino = {"obj1Loc", "obj2Loc", "obj3Loc"};
 	State::setLabelGroup("object locations", grouperino);
-	std::vector<std::string> doms;
-	bool yeet = block_state.getDomains("tall", doms);
-	std::cout<<doms[0]<<std::endl;
-	std::string arg;
-	bool scoob = block_state.argFindGroup("Boogie", "object locations", arg);
-	std::cout<< scoob<< "  " << arg <<std::endl;
-	scoob = block_state.argFindGroup("Ooga", "object locations", arg);
-	std::cout<< scoob<< "  " << arg <<std::endl;
-	/*
-	block_state.print();
-	BlockingState copied_state;
-	copied_state = block_state;
-	copied_state.print();
-	std::cout<<block_state.getVar("obj1Loc")<<std::endl;
-	*/
+	std::vector<std::string> set_state_i = {"L1", "L1", "L2", "L3", "false"};
+	std::vector<std::string> set_state_f = {"L1", "ee", "L2", "L3", "false"};
+	std::vector<bool> which_blocking = {false, true, true, true, false};
+	BlockingState::setBlockingDim(which_blocking);
+
+	State statei;
+	State statef;
+	BlockingState block_state;
+	//block_state.initNewSS();
+	statei.setState(set_state_i);	
+	statef.setState(set_state_f);	
+	//statei.print();
+	//statef.print();
+	std::vector<std::string> indoms;
+	bool yeet = State::getDomains("L2", indoms);
+	std::cout<<indoms[0]<<std::endl;
+
+	std::vector<BlockingState> all_states;
+	BlockingState::generateAllPossibleStates(all_states);
+	for (int i=0; i<all_states.size(); i++) {
+		all_states[i].print();
+	}
+
+	Condition cond_1;
+	cond_1.addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup domain");
+	cond_1.addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
+	cond_1.addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc");
+	cond_1.setPreCondJunctType(Condition::CONJUNCTION);
+
+	cond_1.addPostCondition(Condition::ARG_L, Condition::FILLER, Condition::ARG_EQUALS, Condition::VAR, "ee");
+	cond_1.addPostCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
+	cond_1.setPostCondJunctType(Condition::CONJUNCTION);
+	cond_1.print();
+
+	bool yehaw = cond_1.evaluate(&statei, &statef);
+	std::cout<<" can i connect? "<<yehaw<<std::endl;
 
 	return 0;
 }

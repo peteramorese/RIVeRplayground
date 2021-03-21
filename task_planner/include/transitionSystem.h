@@ -5,6 +5,7 @@
 #include<unordered_map>
 #include "edge.h"
 #include "state.h"
+#include "condition.h"
 
 class TransitionSystem {
 	private:

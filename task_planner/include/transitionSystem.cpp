@@ -1,9 +1,10 @@
 #include<string>
 #include<vector>
 #include<iostream>
-#include "edge.h"
 #include "transitionSystem.h"
+#include "edge.h"
 #include "state.h"
+#include "condition.h"
 
 
 TransitionSystem::TransitionSystem () {

@@ -7,5 +7,5 @@ add_subdirectory(include)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 link_directories(${PROJECT_NAME} PUBLIC include)
 #target_link_libraries(${PROJECT_NAME} EdgeClass AstarClass StateClass TransitionSystemClass)
-target_link_libraries(${PROJECT_NAME} EdgeClass AstarClass StateClass)
+target_link_libraries(${PROJECT_NAME} EdgeClass AstarClass StateClass ConditionClass)
 
