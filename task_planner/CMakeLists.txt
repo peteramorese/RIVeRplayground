@@ -6,5 +6,6 @@ add_executable(${PROJECT_NAME} src/test1.cpp)
 add_subdirectory(include)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 link_directories(${PROJECT_NAME} PUBLIC include)
-target_link_libraries(${PROJECT_NAME} EdgeClass AstarClass StateClass TransitionSystemClass)
+#target_link_libraries(${PROJECT_NAME} EdgeClass AstarClass StateClass TransitionSystemClass)
+target_link_libraries(${PROJECT_NAME} EdgeClass AstarClass StateClass)
 

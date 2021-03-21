@@ -1,7 +1,7 @@
 #include "edge.h"
 #include "astar.h"
 #include "state.h"
-#include "transitionSystem.h"
+//#include "transitionSystem.h"
 int main(){			
 	/*
 	Edge test_graph(false);
@@ -51,27 +51,31 @@ int main(){
 
 	*/
 	/*
-	ManipulatorState ObjectState;
-	ManipulatorState ObjectState1;
-	std::vector<std::string> hello = {"ooga", "booga", "scoobydoo","safed","safep"};
-	std::vector<std::string> objnames = {"thing", "bing", "bong"};
-	ObjectState.setLocationLabels(hello);
-	ObjectState1.setLocationLabels(hello);
-	ObjectState.setObjLabels(objnames);
-	ObjectState1.setObjLabels(objnames);
-	std::vector<int> set_state = {3, 1, 0, State::UNDEF};
-	ObjectState.setState(set_state);
-	ObjectState1.setState(set_state);
-	std::cout<< ObjectState.isDefined()<<std::endl;
-	ObjectState.printState();
 
 	std::cout<<"isgrab " << ObjectState.isGrabbing("ooga")<<std::endl;
 	*/
-	TransitionSystem computerDedLmao;
-	Edge TS(true);
-	Edge* TS_ptr = &TS;
-	computerDedLmao.generateRiver(TS_ptr);
-	TS_ptr->print();
+	std::vector<std::string> var_labels_1 = {"Ooga", "Booga", "Boogie", "Boo"};
+	std::vector<std::string> var_labels_2 = {"tall", "small"};
+	State::setStateDimension(var_labels_1, 0);
+	State::setStateDimension(var_labels_1, 1);
+	State::setStateDimension(var_labels_2, 2);
+	std::vector<std::string> set_state = {"Ooga", "Boo", "small"};
+	State test_state;
+	test_state.setState(set_state);
+	test_state.print();
 
+
+	BlockingState block_state;
+	//block_state.initNewSS();
+	std::vector<std::string> set_state_block = {"Ooga", "Booga", "small"};
+	block_state.setState(set_state_block);	
+	block_state.setState("Boogie", 1);
+	std::vector<std::string> oogas_domain = {"Ooga", "Booga", "Boogie"};
+	std::vector<std::string> other_domain = {"Boo", "tall", "small"};
+	State::setDomain("the oogas", oogas_domain);
+	State::setDomain("the others", other_domain);
+	std::vector<std::string> doms;
+	bool yeet = block_state.getDomains("tall", doms);
+	std::cout<<doms[0]<<std::endl;
 	return 0;
 }
