@@ -74,8 +74,26 @@ int main(){
 	std::vector<std::string> other_domain = {"Boo", "tall", "small"};
 	State::setDomain("the oogas", oogas_domain);
 	State::setDomain("the others", other_domain);
+	State::setStateDimensionLabel(0, "eeLoc");
+	State::setStateDimensionLabel(1, "obj1Loc");
+	State::setStateDimensionLabel(1, "obj2Loc");
+	std::vector<std::string> grouperino = {"obj1Loc", "obj2Loc"};
+	State::setLabelGroup("object locations", grouperino);
 	std::vector<std::string> doms;
 	bool yeet = block_state.getDomains("tall", doms);
 	std::cout<<doms[0]<<std::endl;
+	std::string arg;
+	bool scoob = block_state.argFindGroup("Boogie", "object locations", arg);
+	std::cout<< scoob<< "  " << arg <<std::endl;
+	scoob = block_state.argFindGroup("Ooga", "object locations", arg);
+	std::cout<< scoob<< "  " << arg <<std::endl;
+	/*
+	block_state.print();
+	BlockingState copied_state;
+	copied_state = block_state;
+	copied_state.print();
+	std::cout<<block_state.getVar("obj1Loc")<<std::endl;
+	*/
+
 	return 0;
 }
