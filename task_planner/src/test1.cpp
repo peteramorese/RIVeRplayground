@@ -2,7 +2,8 @@
 #include "astar.h"
 #include "state.h"
 #include "condition.h"
-//#include "transitionSystem.h"
+#include "transitionSystem.h"
+
 int main(){			
 	/*
 	Edge test_graph(false);
@@ -92,11 +93,13 @@ int main(){
 	bool yeet = State::getDomains("L2", indoms);
 	std::cout<<indoms[0]<<std::endl;
 
+	/*
 	std::vector<BlockingState> all_states;
 	BlockingState::generateAllPossibleStates(all_states);
 	for (int i=0; i<all_states.size(); i++) {
 		all_states[i].print();
 	}
+	*/
 
 	Condition cond_1;
 	cond_1.addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup domain");
@@ -111,6 +114,11 @@ int main(){
 
 	bool yehaw = cond_1.evaluate(&statei, &statef);
 	std::cout<<" can i connect? "<<yehaw<<std::endl;
+
+	Edge TS_graph(true);
+	TransitionSystem<State> TS(&TS_graph);
+	TS.addCondition(&cond_1);
+	TS.generate();
 
 	return 0;
 }

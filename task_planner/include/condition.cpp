@@ -3,6 +3,8 @@
 #include "state.h"
 #include "condition.h"
 
+const bool Condition::TRUE = true;
+const bool Condition::NEGATE = false;
 const std::string Condition::FILLER = "FILLER";
 const int Condition::LABEL = 0;
 const int Condition::VAR = 1;
@@ -22,6 +24,17 @@ Condition::Condition() {
 }
 
 void Condition::addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_) {
+	cond_struct.LOGICAL = TRUE;
+	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
+	cond_struct.arg_1 = arg_1_;
+	cond_struct.OPERATOR = OPERATOR_;
+	cond_struct.ARG_2_TYPE = ARG_2_TYPE_;
+	cond_struct.arg_2 = arg_2_  ;
+	pr_c.push_back(cond_struct);
+}
+
+void Condition::addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_) {
+	cond_struct.LOGICAL = LOGICAL_;
 	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
 	cond_struct.arg_1 = arg_1_;
 	cond_struct.OPERATOR = OPERATOR_;
@@ -35,6 +48,17 @@ void Condition::setPreCondJunctType(int LOGICAL_OPERATOR) {
 }
 
 void Condition::addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_) {
+	cond_struct.LOGICAL = TRUE;
+	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
+	cond_struct.arg_1 = arg_1_;
+	cond_struct.OPERATOR = OPERATOR_;
+	cond_struct.ARG_2_TYPE = ARG_2_TYPE_;
+	cond_struct.arg_2 = arg_2_  ;
+	ps_c.push_back(cond_struct);
+}
+
+void Condition::addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_) {
+	cond_struct.LOGICAL = LOGICAL_;
 	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
 	cond_struct.arg_1 = arg_1_;
 	cond_struct.OPERATOR = OPERATOR_;
@@ -45,6 +69,14 @@ void Condition::addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERAT
 
 void Condition::setPostCondJunctType(int LOGICAL_OPERATOR) {
 	post_cond_junct = LOGICAL_OPERATOR;
+}
+
+void Condition::setActionLabel(std::string action_label_) {
+	action_label = action_label_;
+}
+
+std::string Condition::getActionLabel() {
+	return action_label;
 }
 
 bool Condition::subEvaluate(const State* state, const sub_condition& cond) {
@@ -127,6 +159,9 @@ bool Condition::subEvaluate(const State* state, const sub_condition& cond) {
 		default:
 			std::cout<<"Error: Condition Syntax error for operator\n";
 	}
+	if (cond.LOGICAL == NEGATE) {
+		sub_eval = !sub_eval;
+	}
 	return sub_eval;
 }	
 
@@ -179,19 +214,17 @@ postcondition:
 			bool post_eval_i = subEvaluate(post_state, ps_c[i]);
 			switch (ps_c[i].ARG_1_TYPE) {
 				case LABEL:
-					std::cout<<"excl vec pushing back: "<<ps_c[i].arg_1<<std::endl;
 					excl_dim_labels.push_back(ps_c[i].arg_1);
 					break;
 				case ARG_L:
 					if (arg_L.first) {
-						std::cout<<"excl vec pushing back: "<<arg_L.second<<std::endl;
 						excl_dim_labels.push_back(arg_L.second);
 					} else {
 						std::cout<<"Error: Argument not set\n";
 					}
 					break;
-				
-				}
+
+			}
 			switch (post_cond_junct) {
 				case CONJUNCTION:
 					post_eval = post_eval && post_eval_i;
@@ -213,9 +246,6 @@ postcondition:
 		}
 returncondition:
 		eq_eval = pre_state->exclEquals(post_state, excl_dim_labels);
-		std::cout<<"eq_eval: "<<eq_eval<<std::endl;
-		std::cout<<"pre_eval: "<<pre_eval<<std::endl;
-		std::cout<<"post_eval: "<<post_eval<<std::endl;
 		// pre_eval: Are the preconditions satisfied?
 		// post_eval: Are the post conditions satisfied?
 		// eq_eval: Are the other unmentioned dimensions still equal between states?
@@ -230,6 +260,7 @@ returncondition:
 void Condition::sub_print(const std::vector<sub_condition>& p_c) const {
 	for (int i=0; i<p_c.size(); i++){
 		std::cout<<"   -"<<i+1<<") ";
+		bool logi = p_c[i].LOGICAL;
 		switch (p_c[i].ARG_1_TYPE) {
 			case LABEL: 
 				std::cout<<"Dimension Label '"<<p_c[i].arg_1<<"' ";
@@ -243,16 +274,32 @@ void Condition::sub_print(const std::vector<sub_condition>& p_c) const {
 		}
 		switch (p_c[i].OPERATOR) {
 			case EQUALS:
-				std::cout<<"is equal to ";
+				if (logi) {
+					std::cout<<"is equal to ";
+				} else {
+					std::cout<<"is not equal to ";
+				}
 				break;
 			case IN_DOMAIN:
-				std::cout<<"is in ";
+				if (logi) {
+					std::cout<<"is in ";
+				} else {
+					std::cout<<"is not in ";
+				}
 				break;
 			case ARG_FIND:
-				std::cout<<"found ";
+				if (logi) {
+					std::cout<<"found ";
+				} else {
+					std::cout<<"didn't find ";
+				}
 				break;
 			case ARG_EQUALS:
-				std::cout<<"is equal to ";
+				if (logi) {
+					std::cout<<"is equal to ";
+				} else {
+					std::cout<<"is not equal to ";
+				}
 		}
 		switch (p_c[i].ARG_2_TYPE) {
 			case LABEL:

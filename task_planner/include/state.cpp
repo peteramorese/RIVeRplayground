@@ -60,7 +60,6 @@ void State::generateAllPossibleStates(std::vector<State>& all_states) {
 	for (int i=0; i<state_space_dim; i++){
 		int inds = state_space_named[i].size() - 1;
 		counter *= inds;
-		std::cout<<inds<<std::endl;
 		column_wrapper[i] = inds;
 		digits[i] = 0;
 	}
@@ -253,12 +252,12 @@ void State::setState(std::string set_state_var, unsigned int dim) {
 	}
 }
 
-std::vector<std::string> State::getState() const {
-	std::vector<std::string> ret_state;
+void State::getState(std::vector<std::string>& ret_state) const {
+	ret_state.clear();
+	ret_state.resize(state_space_dim);
 	for (int i=0; i<state_space_dim; i++){
 		ret_state[i] = state_space_named[i][state_space[i]];
 	}
-	return ret_state;
 }
 
 std::string State::getVar(std::string dimension_label) const {
@@ -428,7 +427,6 @@ void BlockingState::generateAllPossibleStates(std::vector<BlockingState>& all_st
 	for (int i=0; i<state_space_dim; i++){
 		int inds = state_space_named[i].size() - 1;
 		counter *= inds;
-		std::cout<<inds<<std::endl;
 		column_wrapper[i] = inds;
 		digits[i] = 0;
 	}
@@ -450,7 +448,6 @@ void BlockingState::generateAllPossibleStates(std::vector<BlockingState>& all_st
 		} else {
 			i++;
 		}
-		std::cout<<"i: "<<i<<" j: "<<j<<std::endl;
 		digits[0]++;
 		for (int ii=0; ii<state_space_dim; ii++){
 			if (digits[ii] > column_wrapper[ii]-1) {

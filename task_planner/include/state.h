@@ -35,7 +35,7 @@ class State {
 		bool argFindGroup(std::string var_find, std::string group_label, std::string& arg_dimension_label) const; 
 		void setState(const std::vector<std::string>& set_state);
 		void setState(std::string set_state_var, unsigned int dim);
-		std::vector<std::string> getState() const;
+		void getState(std::vector<std::string>& ret_state) const;
 		std::string getVar(std::string dimension_label) const;
 		bool isDefined() const;
 		void print() const;
