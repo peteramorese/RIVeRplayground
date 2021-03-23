@@ -161,7 +161,6 @@ void Edge::returnListNodes(unsigned int ind_, std::vector<int>& node_list) const
 			currptr = nextptr;
 		}
 	}
-	std::cout<<"node_list size: "<<node_list.size()<<std::endl;
 }
 
 void Edge::returnListLabels(unsigned int ind_, std::vector<std::string>& label_list) const {
@@ -176,7 +175,6 @@ void Edge::returnListLabels(unsigned int ind_, std::vector<std::string>& label_l
 			currptr = nextptr;
 		}
 	}
-	//std::cout<<"node_list size: "<<label_list.size()<<std::endl;
 }
 
 void Edge::returnListWeights(unsigned int ind_, std::vector<float>& weights_list) const {

@@ -7,11 +7,46 @@
 int main(){			
 
 	// Set up the environment:
+	/* ENVIRONMENT: SINGLE OBJECT, TWO DOMAINS (pickup dropoff), ONE LOCATION IN EACH */
 	std::vector<std::string> var_labels_1 = {"safep", "safed", "L1", "L2"};
 	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2"};
 	std::vector<std::string> var_labels_3 = {"true", "false"};
-	std::vector<std::string> domain_pickup = {"L1"};
-	std::vector<std::string> domain_dropoff = {"L2"};
+	std::vector<std::string> domain_pickup = {"L1","safep"};
+	std::vector<std::string> domain_loc_p = {"L1"};
+	std::vector<std::string> domain_dropoff = {"L2","safed"};
+	std::vector<std::string> domain_loc_d = {"L2"};
+	
+	State::setStateDimension(var_labels_1, 0);
+	State::setStateDimension(var_labels_2, 1);
+	State::setStateDimension(var_labels_3, 2);
+	State::setDomain("pickup domain", domain_pickup);
+	State::setDomain("pickup location domain", domain_loc_p);
+	State::setDomain("dropoff domain", domain_dropoff);
+	State::setDomain("dropoff location domain", domain_loc_d);
+	State::setStateDimensionLabel(0, "eeLoc");
+	State::setStateDimensionLabel(1, "obj1Loc");
+	State::setStateDimensionLabel(2, "holding");
+	std::vector<std::string> grouperino = {"obj1Loc"};
+	State::setLabelGroup("object locations", grouperino);
+	std::vector<bool> which_blocking = {false, true, false};
+	BlockingState::setBlockingDim(which_blocking);
+
+	BlockingState init_state;
+	init_state.initNewSS();
+	std::vector<std::string> set_state_i = {"safep", "L1", "false"};
+	init_state.setState(set_state_i);
+
+
+
+
+	/* ENVIRONMENT: TWO OBJECTS, TWO DOMAINS (pickup dropoff), THREE LOCATIONS IN EACH 
+	std::vector<std::string> var_labels_1 = {"safep", "safed", "L1", "L2"};
+	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2"};
+	std::vector<std::string> var_labels_3 = {"true", "false"};
+	std::vector<std::string> domain_pickup = {"L1","safep"};
+	std::vector<std::string> domain_loc_p = {"L1"};
+	std::vector<std::string> domain_dropoff = {"L2","safed"};
+	std::vector<std::string> domain_loc_d = {"L2"};
 	//std::vector<std::string> domain_dropoff = {"L3"};
 	
 	State::setStateDimension(var_labels_1, 0);
@@ -20,7 +55,9 @@ int main(){
 	//State::setStateDimension(var_labels_2, 3);
 	State::setStateDimension(var_labels_3, 2);
 	State::setDomain("pickup domain", domain_pickup);
+	State::setDomain("pickup location domain", domain_loc_p);
 	State::setDomain("dropoff domain", domain_dropoff);
+	State::setDomain("dropoff location domain", domain_loc_d);
 	//State::setDomain("dropoff domain", domain_dropoff);
 	State::setStateDimensionLabel(0, "eeLoc");
 	State::setStateDimensionLabel(1, "obj1Loc");
@@ -36,133 +73,160 @@ int main(){
 	//BlockingState::setBlockingDim(which_blocking);
 	std::vector<bool> which_blocking = {false, true, false};
 	BlockingState::setBlockingDim(which_blocking);
-	std::cout<<"yeet:"<<std::endl;
 
-	//State statei;
-	//State statef;
 	BlockingState init_state;
-	BlockingState fin_state;
 	init_state.initNewSS();
-	fin_state.initNewSS();
 	std::vector<std::string> set_state_i = {"safep", "L1", "false"};
-	std::vector<std::string> set_state_f = {"L1", "ee", "true"};
 	init_state.setState(set_state_i);
-	fin_state.setState(set_state_f);
-	//statei.setState(set_state_i);	
-	//statef.setState(set_state_f);	
-	//statei.print();
-	//statef.print();
-	//std::vector<std::string> indoms;
-	//bool yeet = State::getDomains("L2", indoms);
-	//std::cout<<indoms[0]<<std::endl;
+	*/
+
+
+
+
 
 	/* SET CONDITIONS */
 	// Pickup domain conditions:
-	Condition cond_1; // Grasp in pickup domain
-	cond_1.addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup domain");
-	cond_1.addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
-	cond_1.addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc");
-	cond_1.setPreCondJunctType(Condition::CONJUNCTION);
+	std::vector<Condition> conds;
+	std::vector<Condition*> cond_ptrs;
+	conds.resize(10);
+	cond_ptrs.resize(10);
 
-	cond_1.addPostCondition(Condition::ARG_L, Condition::FILLER, Condition::ARG_EQUALS, Condition::VAR, "ee");
-	cond_1.addPostCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
-	cond_1.setPostCondJunctType(Condition::CONJUNCTION);
-	cond_1.setActionLabel("grasp");
-	cond_1.print();
+	// Grasp in pickup domain
+	conds[0].addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup location domain");
+	conds[0].addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
+	conds[0].addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc",Condition::TRUE, "arg");
+	conds[0].setPreCondJunctType(Condition::CONJUNCTION);
 
-
-	Condition cond_2; // Move from safe pose to a location to drop object
-	cond_2.addPreCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safep");
-	cond_2.addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
-	cond_2.setPreCondJunctType(Condition::CONJUNCTION);
-
-	cond_2.addPostCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc", Condition::NEGATE);
-	cond_2.addPostCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup domain");
-	cond_2.setPostCondJunctType(Condition::CONJUNCTION);
-	cond_2.setActionLabel("move");
+	conds[0].addPostCondition(Condition::ARG_L, Condition::FILLER, Condition::ARG_EQUALS, Condition::VAR, "ee",Condition::TRUE, "arg");
+	conds[0].addPostCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
+	conds[0].setPostCondJunctType(Condition::CONJUNCTION);
+	conds[0].setActionLabel("grasp");
+	//conds[0].print();
 
 
-	Condition cond_3; // Move from safe pose to a location to pickup an object
-	cond_3.addPreCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safep");
-	cond_3.addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
-	cond_3.setPreCondJunctType(Condition::CONJUNCTION);
+	// Move around pickup domain with an object 
+	conds[1].addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
+	conds[1].addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup domain");
+	conds[1].addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc", Condition::NEGATE, "arg1");
+	conds[1].addPreCondition(Condition::LABEL, "eeLoc", Condition::ARG_FIND, Condition::NONE, Condition::FILLER, Condition::TRUE, "arg2");
+	conds[1].setPreCondJunctType(Condition::CONJUNCTION); // Used to store eeLoc pre-state variable
 
-	cond_3.addPostCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup domain");
-	cond_3.setPostCondJunctType(Condition::CONJUNCTION);
-	cond_3.setActionLabel("move");
+	conds[1].addPostCondition(Condition::ARG_V, Condition::FILLER, Condition::ARG_EQUALS, Condition::LABEL, "eeLoc", Condition::NEGATE, "arg2"); // Stored eeLoc pre-state variable is not the same as post-state eeLoc (eeLoc has moved)
+	conds[1].addPostCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup domain");
+	conds[1].addPostCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc", Condition::NEGATE,"na");
+	conds[1].setPostCondJunctType(Condition::CONJUNCTION);
+	conds[1].setActionLabel("move");
+	//conds[1].print();
+
+	// Release the object that the eef is holding
+	conds[2].addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup location domain");
+	conds[2].addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
+	conds[2].addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc", Condition::NEGATE, "arg1");
+	conds[2].addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::VAR, "ee",Condition::TRUE, "arg2");
+	conds[2].setPreCondJunctType(Condition::CONJUNCTION);
+
+	conds[2].addPostCondition(Condition::ARG_L, Condition::FILLER, Condition::ARG_EQUALS, Condition::LABEL, "eeLoc", Condition::TRUE, "arg2");
+	conds[2].addPostCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
+	conds[2].setPostCondJunctType(Condition::CONJUNCTION);
+	conds[2].setActionLabel("release");
+	//conds[2].print();
 
 
-	Condition cond_4; // Translate from pickup domain to drop off domain
-	cond_4.addPreCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safep");
-	cond_4.setPreCondJunctType(Condition::CONJUNCTION);
+	// Move around pickup domain without an object
+	conds[3].addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
+	conds[3].addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup domain");
+	conds[3].addPreCondition(Condition::LABEL, "eeLoc", Condition::ARG_FIND, Condition::NONE, Condition::FILLER, Condition::TRUE, "arg");
+	conds[3].setPreCondJunctType(Condition::CONJUNCTION);
 
-	cond_4.addPostCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safed");
-	cond_4.setPostCondJunctType(Condition::CONJUNCTION);
-	cond_4.setActionLabel("translate");
+	conds[3].addPostCondition(Condition::ARG_V, Condition::FILLER, Condition::ARG_EQUALS, Condition::LABEL, "eeLoc", Condition::NEGATE,"arg");
+	conds[3].addPostCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup domain");
+	conds[3].setPostCondJunctType(Condition::CONJUNCTION);
+	conds[3].setActionLabel("move");
+	//conds[3].print();
+
+
+	// Translate from pickup domain to drop off domain
+	conds[4].addPreCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safep");
+	conds[4].setPreCondJunctType(Condition::CONJUNCTION);
+
+	conds[4].addPostCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safed");
+	conds[4].setPostCondJunctType(Condition::CONJUNCTION);
+	conds[4].setActionLabel("translate");
+	//conds[4].print();
 
 
 	// Dropoff domain conditions:
-	Condition cond_5; // Grasp in pickup domain
-	cond_5.addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "dropoff domain");
-	cond_5.addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
-	cond_5.addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc");
-	cond_5.setPreCondJunctType(Condition::CONJUNCTION);
+	
+	// Grasp in dropoff domain
+	conds[5].addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "dropoff location domain");
+	conds[5].addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
+	conds[5].addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc", Condition::TRUE, "arg");
+	conds[5].setPreCondJunctType(Condition::CONJUNCTION);
 
-	cond_5.addPostCondition(Condition::ARG_L, Condition::FILLER, Condition::ARG_EQUALS, Condition::VAR, "ee");
-	cond_5.addPostCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
-	cond_5.setPostCondJunctType(Condition::CONJUNCTION);
-	cond_5.setActionLabel("grasp");
-	cond_5.print();
+	conds[5].addPostCondition(Condition::ARG_L, Condition::FILLER, Condition::ARG_EQUALS, Condition::VAR, "ee", Condition::TRUE, "arg");
+	conds[5].addPostCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
+	conds[5].setPostCondJunctType(Condition::CONJUNCTION);
+	conds[5].setActionLabel("grasp");
+	//conds[5].print();
+
+	// Move around dropoff domain with an object 
+	conds[6].addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
+	conds[6].addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "dropoff domain");
+	conds[6].addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc", Condition::NEGATE, "arg1");
+	conds[6].addPreCondition(Condition::LABEL, "eeLoc", Condition::ARG_FIND, Condition::NONE, Condition::FILLER, Condition::TRUE, "arg2");
+	conds[6].setPreCondJunctType(Condition::CONJUNCTION); // Used to store eeLoc pre-state variable
+
+	conds[6].addPostCondition(Condition::ARG_V, Condition::FILLER, Condition::ARG_EQUALS, Condition::LABEL, "eeLoc", Condition::NEGATE, "arg2"); // Stored eeLoc pre-state variable is not the same as post-state eeLoc (eeLoc has moved)
+	conds[6].addPostCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "dropoff domain");
+	conds[6].addPostCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc", Condition::NEGATE, "na");
+	conds[6].setPostCondJunctType(Condition::CONJUNCTION);
+	conds[6].setActionLabel("move");
+	//conds[6].print();
+
+	// Release the object that the eef is holding
+	conds[7].addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "dropoff location domain");
+	conds[7].addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
+	conds[7].addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc", Condition::NEGATE, "arg1");
+	conds[7].addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::VAR, "ee", Condition::TRUE, "arg2");
+	conds[7].setPreCondJunctType(Condition::CONJUNCTION);
+
+	conds[7].addPostCondition(Condition::ARG_L, Condition::FILLER, Condition::ARG_EQUALS, Condition::LABEL, "eeLoc", Condition::TRUE, "arg2");
+	conds[7].addPostCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
+	conds[7].setPostCondJunctType(Condition::CONJUNCTION);
+	conds[7].setActionLabel("release");
+	//conds[7].print();
+	
+	// Move around dropoff domain without an object
+	conds[8].addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
+	conds[8].addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "dropoff domain");
+	conds[8].addPreCondition(Condition::LABEL, "eeLoc", Condition::ARG_FIND, Condition::NONE, Condition::FILLER, Condition::TRUE, "arg");
+	conds[8].setPreCondJunctType(Condition::CONJUNCTION);
+
+	conds[8].addPostCondition(Condition::ARG_V, Condition::FILLER, Condition::ARG_EQUALS, Condition::LABEL, "eeLoc", Condition::NEGATE, "arg");
+	conds[8].addPostCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "dropoff domain");
+	conds[8].setPostCondJunctType(Condition::CONJUNCTION);
+	conds[8].setActionLabel("move");
+	//conds[8].print();
 
 
-	Condition cond_6; // Move from safe pose to a location to drop object
-	cond_6.addPreCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safed");
-	cond_6.addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
-	cond_6.setPreCondJunctType(Condition::CONJUNCTION);
+	// Translate from pickup domain to drop off domain
+	conds[9].addPreCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safed");
+	conds[9].setPreCondJunctType(Condition::CONJUNCTION);
 
-	cond_6.addPostCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc", Condition::NEGATE);
-	cond_6.addPostCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "dropoff domain");
-	cond_6.setPostCondJunctType(Condition::CONJUNCTION);
-	cond_6.setActionLabel("move");
-
-
-	Condition cond_7; // Move from safe pose to a location to pickup an object
-	cond_7.addPreCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safed");
-	cond_7.addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
-	cond_7.setPreCondJunctType(Condition::CONJUNCTION);
-
-	cond_7.addPostCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "dropoff domain");
-	cond_7.setPostCondJunctType(Condition::CONJUNCTION);
-	cond_7.setActionLabel("move");
+	conds[9].addPostCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safep");
+	conds[9].setPostCondJunctType(Condition::CONJUNCTION);
+	conds[9].setActionLabel("translate");
+	//conds[9].print();
 
 
-	Condition cond_8; // Translate from pickup domain to drop off domain
-	cond_8.addPreCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safed");
-	cond_8.setPreCondJunctType(Condition::CONJUNCTION);
-
-	cond_8.addPostCondition(Condition::LABEL, "eeLoc", Condition::EQUALS, Condition::VAR, "safep");
-	cond_8.setPostCondJunctType(Condition::CONJUNCTION);
-	cond_8.setActionLabel("translate");
-
-
-
-
-
-
-
-	bool yehaw = cond_1.evaluate(&init_state, &fin_state);
-	std::cout<<" can i connect? "<<yehaw<<std::endl;
+	
+	for (int i=0; i<conds.size(); ++i){
+		cond_ptrs[i] = &conds[i];
+	}
 
 	Edge TS_graph(true);
-	TransitionSystem<State> TS(&TS_graph);
-	TS.addCondition(&cond_1);
-	TS.addCondition(&cond_2);
-	TS.addCondition(&cond_3);
-	TS.addCondition(&cond_4);
-	TS.addCondition(&cond_5);
-	TS.addCondition(&cond_6);
-	TS.addCondition(&cond_7);
-	TS.addCondition(&cond_8);
+	TransitionSystem<BlockingState> TS(&TS_graph);
+	TS.setConditions(cond_ptrs);
 	TS.setInitState(&init_state);
 	TS.generate();
 	//TS_graph.print();

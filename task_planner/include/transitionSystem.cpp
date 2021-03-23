@@ -10,16 +10,22 @@
 template <class T>
 TransitionSystem<T>::TransitionSystem (Edge* graph_) : graph(graph_), has_conditions(false) {
 	conditions.clear();
+	all_states.clear();
 	T::generateAllPossibleStates(all_states);
 	state_added.resize(all_states.size());
 	for (int i=0; i<state_added.size(); ++i) {
 		state_added[i] = false;
 	}
+	
+	/*
 	for (int i=0; i<all_states.size(); i++) {
 		std::cout<<" --- "<<std::endl;
+		std::cout<<"  "<<i<<std::endl;
 		all_states[i].print();
 		std::cout<<" --- "<<std::endl;
 	}
+	*/
+
 }
 
 template <class T>
@@ -41,7 +47,7 @@ void TransitionSystem<T>::setInitState(T* init_state_) {
 }
 
 template <class T>
-void TransitionSystem<T>::safeAddState(T* curr_state_, T* add_state, int add_state_ind, Condition* cond){
+void TransitionSystem<T>::safeAddState(T* curr_state, T* add_state, int add_state_ind, Condition* cond){
 	std::string action = cond->getActionLabel();
 	if (!state_added[add_state_ind]) {
 		state_map.push_back(add_state);
@@ -73,9 +79,10 @@ unsigned int TransitionSystem<T>::generate() {
 	   }
 	   */
 	T* init_state_in_set;
-	for (int i=0; i<all_states.size(); ++i) {
+	for (int i=0; i<state_count; ++i) {
 		if (all_states[i] == init_state) {
 			init_state_in_set = &all_states[i];
+			state_added[i] = true;
 		}	
 	}
 

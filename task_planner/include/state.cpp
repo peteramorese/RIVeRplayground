@@ -390,7 +390,7 @@ bool BlockingState::setState(std::string set_state_var, unsigned int dim) {
 	} else {
 		bool conflict = false;
 		for (int i=0; i<state_space_dim; i++) {
-			if (blocking_dims[i]) {
+			if (blocking_dims[i] && i!=dim) {
 				if (state_space_named[i][state_space[i]] == set_state_var) {
 					std::cout<<"Warning: Cannot set Blocking State, duplication location: "<<set_state_var<<"\n";
 					conflict = true;
@@ -398,14 +398,15 @@ bool BlockingState::setState(std::string set_state_var, unsigned int dim) {
 				}
 			}
 		}
-		for (int i=0; i<num_vars[i]; i++){
+		for (int i=0; i<num_vars[dim]; i++){
 			if (state_space_named[dim][i] == set_state_var) {
 				name_found = true;
 				state_space[dim] = i;
+				break;
 			}
 		}
 		if (!name_found) {
-			std::cout<<"Error: Unrecognized label in set state\n";
+			std::cout<<"Error: Unrecognized label in set state BOOGA\n";
 		} else {
 			return true;
 		}
@@ -461,7 +462,7 @@ void BlockingState::generateAllPossibleStates(std::vector<BlockingState>& all_st
 		}
 	}
 loopexit:
-	all_states.resize(j+1);
+	all_states.resize(j);
 	std::cout<<"Info: Generated "<<j<<" blocking states out of "<<counter<<" possible states\n";
 }
 

@@ -2,6 +2,7 @@
 #include<vector>
 #include "state.h"
 #include<string>
+#include<unordered_map>
 
 class Condition {
 	private:
@@ -18,18 +19,25 @@ class Condition {
 		std::vector<sub_condition> ps_c;
 		int pre_cond_junct;
 		int post_cond_junct;
-		std::pair<bool, std::string> arg_L;
+		std::vector<std::pair<bool, std::string>> arg_L;
+		std::unordered_map<std::string, int> arg_L_labels;
+		std::vector<std::pair<bool, std::string>> arg_V;
+		std::unordered_map<std::string, int> arg_V_labels;
+		std::pair<bool, std::string> arg_L_i;
+		std::pair<bool, std::string> arg_V_i;
 		void sub_print(const std::vector<sub_condition>& p_c) const;
 		std::string action_label;
 	public:	
 		static const bool TRUE;
 		static const bool NEGATE;
 		static const std::string FILLER;
+		static const int NONE;
 		static const int LABEL;
 		static const int VAR;	
 		static const int DOMAIN;	
 		static const int GROUP;
 		static const int ARG_L;	
+		static const int ARG_V;	
 		static const int EQUALS;	
 		static const int IN_DOMAIN;	
 		static const int ARG_FIND;	
@@ -40,9 +48,11 @@ class Condition {
 		Condition();
 		void addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_);
 		void addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_);
+		void addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_);
 		void setPreCondJunctType(int LOGICAL_OPERATOR);
 		void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_);
 		void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_);
+		void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_);
 		void setPostCondJunctType(int LOGICAL_OPERATOR);
 		void setActionLabel(std::string action_label_);
 		std::string getActionLabel();
