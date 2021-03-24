@@ -20,13 +20,16 @@ const int Condition::ARG_FIND = 8;
 const int Condition::ARG_EQUALS = 9;
 const int Condition::CONJUNCTION = 10;
 const int Condition::DISJUNCTION = 11;
+const int Condition::PRE = 12;
+const int Condition::POST = 13;
+const int Condition::SIMPLE = 14;
 
 Condition::Condition() {
 	pr_c.clear();
 	ps_c.clear();
 }
 
-void Condition::addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_) {
+void Condition::addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_) {
 	cond_struct.LOGICAL = TRUE;
 	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
 	cond_struct.arg_1 = arg_1_;
@@ -34,10 +37,16 @@ void Condition::addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATO
 	cond_struct.ARG_2_TYPE = ARG_2_TYPE_;
 	cond_struct.arg_2 = arg_2_;
 	cond_struct.condition_label = FILLER;
-	pr_c.push_back(cond_struct);
+	if (COND_TYPE_ == PRE) {
+		pr_c.push_back(cond_struct);
+	} else if (COND_TYPE_ == POST) {
+		ps_c.push_back(cond_struct);
+	} else {
+		std::cout<<"Error: Invalid condition type\n";
+	}
 }
 
-void Condition::addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_) {
+void Condition::addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_) {
 	cond_struct.LOGICAL = LOGICAL_;
 	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
 	cond_struct.arg_1 = arg_1_;
@@ -45,10 +54,16 @@ void Condition::addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATO
 	cond_struct.ARG_2_TYPE = ARG_2_TYPE_;
 	cond_struct.arg_2 = arg_2_;
 	cond_struct.condition_label = FILLER;
-	pr_c.push_back(cond_struct);
+	if (COND_TYPE_ == PRE) {
+		pr_c.push_back(cond_struct);
+	} else if (COND_TYPE_ == POST) {
+		ps_c.push_back(cond_struct);
+	} else {
+		std::cout<<"Error: Invalid condition type\n";
+	}
 }
 
-void Condition::addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_) {
+void Condition::addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_) {
 	cond_struct.LOGICAL = LOGICAL_;
 	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
 	cond_struct.arg_1 = arg_1_;
@@ -56,13 +71,26 @@ void Condition::addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATO
 	cond_struct.ARG_2_TYPE = ARG_2_TYPE_;
 	cond_struct.arg_2 = arg_2_;
 	cond_struct.condition_label = condition_label_;
-	pr_c.push_back(cond_struct);
+	if (COND_TYPE_ == PRE) {
+		pr_c.push_back(cond_struct);
+	} else if (COND_TYPE_ == POST) {
+		ps_c.push_back(cond_struct);
+	} else {
+		std::cout<<"Error: Invalid condition type\n";
+	}
 }
 
-void Condition::setPreCondJunctType(int LOGICAL_OPERATOR) {
-	pre_cond_junct = LOGICAL_OPERATOR;
+void Condition::setCondJunctType(int COND_TYPE_, int LOGICAL_OPERATOR) {
+	if (COND_TYPE_ == PRE) {
+		pre_cond_junct = LOGICAL_OPERATOR;
+	} else if (COND_TYPE_ == POST) {
+		post_cond_junct = LOGICAL_OPERATOR;
+	} else {
+		std::cout<<"Error: Invalid condition type\n";
+	}
 }
 
+/*
 void Condition::addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_) {
 	cond_struct.LOGICAL = TRUE;
 	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
@@ -96,10 +124,10 @@ void Condition::addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERAT
 	ps_c.push_back(cond_struct);
 }
 
-
 void Condition::setPostCondJunctType(int LOGICAL_OPERATOR) {
 	post_cond_junct = LOGICAL_OPERATOR;
 }
+*/
 
 void Condition::setActionLabel(std::string action_label_) {
 	action_label = action_label_;
@@ -107,6 +135,14 @@ void Condition::setActionLabel(std::string action_label_) {
 
 std::string Condition::getActionLabel() {
 	return action_label;
+}
+
+void Condition::setLabel(std::string label_) {
+	label = label_;
+}
+
+std::string Condition::getLabel() {
+	return label;
 }
 
 bool Condition::subEvaluate(const State* state, const sub_condition& cond) {
@@ -457,3 +493,91 @@ returncondition:
 		}
 		sub_print(ps_c);
 	}
+
+/* SimpleCondition CLASS DEFINITION */ 
+
+void SimpleCondition::addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_) {
+	cond_struct.LOGICAL = TRUE;
+	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
+	cond_struct.arg_1 = arg_1_;
+	cond_struct.OPERATOR = OPERATOR_;
+	cond_struct.ARG_2_TYPE = ARG_2_TYPE_;
+	cond_struct.arg_2 = arg_2_;
+	cond_struct.condition_label = FILLER;
+	s_c.push_back(cond_struct);
+	if (COND_TYPE_ != SIMPLE) {
+		std::cout<<"WARNING: Invalid condition type\n";
+	}
+}
+
+void SimpleCondition::addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_) {
+	cond_struct.LOGICAL = LOGICAL_;
+	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
+	cond_struct.arg_1 = arg_1_;
+	cond_struct.OPERATOR = OPERATOR_;
+	cond_struct.ARG_2_TYPE = ARG_2_TYPE_;
+	cond_struct.arg_2 = arg_2_;
+	cond_struct.condition_label = FILLER;
+	s_c.push_back(cond_struct);
+	if (COND_TYPE_ != SIMPLE) {
+		std::cout<<"WARNING: Invalid condition type\n";
+	}
+}
+
+void SimpleCondition::addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_) {
+	cond_struct.LOGICAL = LOGICAL_;
+	cond_struct.ARG_1_TYPE = ARG_1_TYPE_;
+	cond_struct.arg_1 = arg_1_;
+	cond_struct.OPERATOR = OPERATOR_;
+	cond_struct.ARG_2_TYPE = ARG_2_TYPE_;
+	cond_struct.arg_2 = arg_2_;
+	cond_struct.condition_label = condition_label_;
+	s_c.push_back(cond_struct);
+	if (COND_TYPE_ != SIMPLE) {
+		std::cout<<"WARNING: Invalid condition type\n";
+	}
+}
+
+void SimpleCondition::setCondJunctType(int COND_TYPE_, int LOGICAL_OPERATOR) {
+	if (COND_TYPE_ != SIMPLE) {
+		std::cout<<"WARNING: Invalid condition type\n";
+	}
+	simple_cond_junct = LOGICAL_OPERATOR;
+}
+
+bool SimpleCondition::evaluate(const State* state) {
+	bool eval;
+	switch (simple_cond_junct) {
+		case CONJUNCTION:
+			eval = true;
+			break;
+		case DISJUNCTION:
+			eval = false;
+			break;
+	}
+	for (int i=0; i<s_c.size(); i++){
+		bool eval_i = subEvaluate(state, s_c[i]);
+		switch (simple_cond_junct) {
+			case CONJUNCTION:
+				eval = eval && eval_i;
+				if (eval) {
+					break;
+				} else {
+					goto returncondition;
+				}
+				break;
+			case DISJUNCTION:
+				eval = eval || eval_i;
+				if (eval) {
+					goto returncondition;
+				} else {
+					break;
+				}
+				break;
+		}	
+	}
+returncondition:
+	return eval;
+} 
+
+

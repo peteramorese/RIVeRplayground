@@ -52,10 +52,6 @@ int main(){
 	graph_product.print();
 
 	*/
-	/*
-
-	std::cout<<"isgrab " << ObjectState.isGrabbing("ooga")<<std::endl;
-	*/
 	std::vector<std::string> var_labels_1 = {"safep", "L1", "L2", "L3"};
 	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2", "L3"};
 	std::vector<std::string> var_labels_3 = {"true", "false"};
@@ -76,7 +72,7 @@ int main(){
 	State::setStateDimensionLabel(4, "holding");
 	std::vector<std::string> grouperino = {"obj1Loc", "obj2Loc", "obj3Loc"};
 	State::setLabelGroup("object locations", grouperino);
-	std::vector<std::string> set_state_i = {"L1", "L1", "L2", "L3", "false"};
+	std::vector<std::string> set_state_i = {"L1", "L2", "L2", "L3", "false"};
 	std::vector<std::string> set_state_f = {"L1", "ee", "L2", "L3", "false"};
 	std::vector<bool> which_blocking = {false, true, true, true, false};
 	BlockingState::setBlockingDim(which_blocking);
@@ -100,25 +96,13 @@ int main(){
 		all_states[i].print();
 	}
 	*/
+	
+	SimpleCondition p1;
+	p1.addCondition(Condition::SIMPLE, Condition::LABEL, "obj1Loc", Condition::EQUALS, Condition::VAR, "L1");
+	p1.setCondJunctType(Condition::SIMPLE, Condition::CONJUNCTION);
+	std::cout<<" is  me  troo? "<<p1.evaluate(&statei)<<std::endl;
 
-	Condition cond_1;
-	cond_1.addPreCondition(Condition::LABEL, "eeLoc", Condition::IN_DOMAIN, Condition::DOMAIN, "pickup domain");
-	cond_1.addPreCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "false");
-	cond_1.addPreCondition(Condition::GROUP, "object locations", Condition::ARG_FIND, Condition::LABEL, "eeLoc");
-	cond_1.setPreCondJunctType(Condition::CONJUNCTION);
-
-	cond_1.addPostCondition(Condition::ARG_L, Condition::FILLER, Condition::ARG_EQUALS, Condition::VAR, "ee");
-	cond_1.addPostCondition(Condition::LABEL, "holding", Condition::EQUALS, Condition::VAR, "true");
-	cond_1.setPostCondJunctType(Condition::CONJUNCTION);
-	cond_1.print();
-
-	bool yehaw = cond_1.evaluate(&statei, &statef);
-	std::cout<<" can i connect? "<<yehaw<<std::endl;
-
-	Edge TS_graph(true);
-	TransitionSystem<State> TS(&TS_graph);
-	TS.addCondition(&cond_1);
-	TS.generate();
+	
 
 	return 0;
 }

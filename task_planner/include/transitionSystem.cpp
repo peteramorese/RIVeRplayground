@@ -8,7 +8,7 @@
 
 
 template <class T>
-TransitionSystem<T>::TransitionSystem (Edge* graph_) : graph(graph_), has_conditions(false) {
+TransitionSystem<T>::TransitionSystem (Edge* graph_TS_) : graph_TS(graph_TS_), has_conditions(false) {
 	conditions.clear();
 	all_states.clear();
 	T::generateAllPossibleStates(all_states);
@@ -53,11 +53,11 @@ void TransitionSystem<T>::safeAddState(T* curr_state, T* add_state, int add_stat
 		state_map.push_back(add_state);
 		state_added[add_state_ind] = true;
 		unsigned int new_ind = state_map.size()-1;
-		graph->Edge::connect(q_i, new_ind, 1.0f, action);
+		graph_TS->Edge::connect(q_i, new_ind, 1.0f, action);
 	} else {
 		for (int i=0; i<state_map.size(); ++i) {
 			if (add_state == state_map[i]) {
-				graph->Edge::connect(q_i, i, 1.0f, action);				
+				graph_TS->Edge::connect(q_i, i, 1.0f, action);				
 			}
 		}
 	}
@@ -117,8 +117,8 @@ void TransitionSystem<T>::print() const {
 		T* curr_state = state_map[i];
 		std::vector<int> list_nodes; 
 		std::vector<std::string> list_actions; 
-		graph->returnListNodes(i, list_nodes);
-		graph->returnListLabels(i, list_actions);
+		graph_TS->returnListNodes(i, list_nodes);
+		graph_TS->returnListLabels(i, list_actions);
 		std::cout<<"State "<<i<<": ";
 		std::vector<std::string> state_i; 
 		curr_state->getState(state_i);

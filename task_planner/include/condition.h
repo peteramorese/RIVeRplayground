@@ -5,7 +5,7 @@
 #include<unordered_map>
 
 class Condition {
-	private:
+	protected:
 		struct sub_condition {
 			bool LOGICAL;
 			int ARG_1_TYPE;
@@ -27,6 +27,7 @@ class Condition {
 		std::pair<bool, std::string> arg_V_i;
 		void sub_print(const std::vector<sub_condition>& p_c) const;
 		std::string action_label;
+		std::string label;
 	public:	
 		static const bool TRUE;
 		static const bool NEGATE;
@@ -44,19 +45,38 @@ class Condition {
 		static const int ARG_EQUALS;	
 		static const int CONJUNCTION;	
 		static const int DISJUNCTION;
+		static const int PRE;
+		static const int POST;
+		static const int SIMPLE;
 
 		Condition();
-		void addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_);
-		void addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_);
-		void addPreCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_);
-		void setPreCondJunctType(int LOGICAL_OPERATOR);
-		void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_);
-		void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_);
-		void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_);
-		void setPostCondJunctType(int LOGICAL_OPERATOR);
+		virtual void addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_);
+		virtual void addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_);
+		virtual void addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_);
+		virtual void setCondJunctType(int COND_TYPE_, int LOGICAL_OPERATOR);
+		//void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_);
+		//void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_);
+		//void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_);
+		//void setPostCondJunctType(int LOGICAL_OPERATOR);
 		void setActionLabel(std::string action_label_);
 		std::string getActionLabel();
+		void setLabel(std::string label_);
+		std::string getLabel();
 		bool subEvaluate(const State* state, const sub_condition& cond);
 		bool evaluate(const State* pre_state, const State* post_state);
 		void print() const;
 };
+
+
+class SimpleCondition : public Condition {
+	private:
+		std::vector<sub_condition> s_c;
+		int simple_cond_junct;
+	public:
+		void addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_);
+		void addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_);
+		void addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_);
+		void setCondJunctType(int COND_TYPE_, int LOGICAL_OPERATOR);
+		bool evaluate(const State* state);
+};
+
