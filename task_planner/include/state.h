@@ -54,7 +54,9 @@ class State {
 class BlockingState : public State {
 	private:
 		static std::vector<bool> blocking_dims;
+		static bool debug;
 	public:
+		static void toggleDebug(bool debug_);
 		static void setBlockingDim(const std::vector<bool>& blocking_dims_);
 		static void setBlockingDim(bool blocking, unsigned int dim);
 		static void generateAllPossibleStates(std::vector<BlockingState>& all_states) ;

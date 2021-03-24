@@ -35,6 +35,9 @@ void State::resizeAll() {
 
 void State::initNewSS() {
 	state_space.resize(state_space_dim);
+	for (int i=0; i<state_space_dim; ++i) {
+		state_space[i] = num_vars[i]-1;
+	}
 }
 
 
@@ -324,6 +327,11 @@ void State::operator= (const State* state_eq_ptr) {
 /* BlockingState DEFINTION */
 
 std::vector<bool> BlockingState::blocking_dims;
+bool BlockingState::debug = false;
+
+void BlockingState::toggleDebug(bool debug_) {
+	debug = debug_;
+}
 
 void BlockingState::setBlockingDim(const std::vector<bool>& blocking_dims_) {
 	blocking_dims = blocking_dims_;
@@ -346,7 +354,9 @@ bool BlockingState::setState(const std::vector<std::string>& set_state) {
 				if (blocking_dims[i]) {
 					for (int ii=i+1; ii<set_state.size(); ii++) {
 						if (set_state[i] == set_state[ii]) {
-							std::cout<<"Warning: Cannot set Blocking State, duplication location: "<<set_state[i]<<"\n";
+							if (debug) {
+								std::cout<<"Warning: Cannot set Blocking State, duplication location: "<<set_state[i]<<"\n";
+							}
 							conflict = true;
 							goto blocking;
 						}
@@ -389,12 +399,17 @@ bool BlockingState::setState(std::string set_state_var, unsigned int dim) {
 		std::cout<<"Error: Dimension out of bounds\n";
 	} else {
 		bool conflict = false;
-		for (int i=0; i<state_space_dim; i++) {
-			if (blocking_dims[i] && i!=dim) {
-				if (state_space_named[i][state_space[i]] == set_state_var) {
-					std::cout<<"Warning: Cannot set Blocking State, duplication location: "<<set_state_var<<"\n";
-					conflict = true;
-					goto blocking;
+		if (blocking_dims[dim]) {
+			for (int i=0; i<state_space_dim; i++) {
+				if (blocking_dims[i] && i!=dim) {
+					//std::cout<<"statevar: "<<state_space_named[i][state_space[i]]<<std::endl;
+					if (state_space_named[i][state_space[i]] == set_state_var) {
+						if (debug) {
+							std::cout<<"Warning: Cannot set Blocking State, duplication location: "<<set_state_var<<"\n";
+						}
+						conflict = true;
+						goto blocking;
+					}
 				}
 			}
 		}
@@ -406,7 +421,7 @@ bool BlockingState::setState(std::string set_state_var, unsigned int dim) {
 			}
 		}
 		if (!name_found) {
-			std::cout<<"Error: Unrecognized label in set state BOOGA\n";
+			std::cout<<"Error: Unrecognized label in set state\n";
 		} else {
 			return true;
 		}

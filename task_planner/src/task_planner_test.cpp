@@ -7,7 +7,7 @@
 int main(){			
 
 	// Set up the environment:
-	/* ENVIRONMENT: SINGLE OBJECT, TWO DOMAINS (pickup dropoff), ONE LOCATION IN EACH */
+	/* ENVIRONMENT: SINGLE OBJECT, TWO DOMAINS (pickup dropoff), ONE LOCATION IN EACH
 	std::vector<std::string> var_labels_1 = {"safep", "safed", "L1", "L2"};
 	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2"};
 	std::vector<std::string> var_labels_3 = {"true", "false"};
@@ -28,49 +28,6 @@ int main(){
 	State::setStateDimensionLabel(2, "holding");
 	std::vector<std::string> grouperino = {"obj1Loc"};
 	State::setLabelGroup("object locations", grouperino);
-	std::vector<bool> which_blocking = {false, true, false};
-	BlockingState::setBlockingDim(which_blocking);
-
-	BlockingState init_state;
-	init_state.initNewSS();
-	std::vector<std::string> set_state_i = {"safep", "L1", "false"};
-	init_state.setState(set_state_i);
-
-
-
-
-	/* ENVIRONMENT: TWO OBJECTS, TWO DOMAINS (pickup dropoff), THREE LOCATIONS IN EACH 
-	std::vector<std::string> var_labels_1 = {"safep", "safed", "L1", "L2"};
-	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2"};
-	std::vector<std::string> var_labels_3 = {"true", "false"};
-	std::vector<std::string> domain_pickup = {"L1","safep"};
-	std::vector<std::string> domain_loc_p = {"L1"};
-	std::vector<std::string> domain_dropoff = {"L2","safed"};
-	std::vector<std::string> domain_loc_d = {"L2"};
-	//std::vector<std::string> domain_dropoff = {"L3"};
-	
-	State::setStateDimension(var_labels_1, 0);
-	State::setStateDimension(var_labels_2, 1);
-	//State::setStateDimension(var_labels_2, 2);
-	//State::setStateDimension(var_labels_2, 3);
-	State::setStateDimension(var_labels_3, 2);
-	State::setDomain("pickup domain", domain_pickup);
-	State::setDomain("pickup location domain", domain_loc_p);
-	State::setDomain("dropoff domain", domain_dropoff);
-	State::setDomain("dropoff location domain", domain_loc_d);
-	//State::setDomain("dropoff domain", domain_dropoff);
-	State::setStateDimensionLabel(0, "eeLoc");
-	State::setStateDimensionLabel(1, "obj1Loc");
-	//State::setStateDimensionLabel(2, "obj2Loc");
-	//State::setStateDimensionLabel(3, "obj3Loc");
-	State::setStateDimensionLabel(2, "holding");
-	//std::vector<std::string> grouperino = {"obj1Loc", "obj2Loc", "obj3Loc"};
-	std::vector<std::string> grouperino = {"obj1Loc"};
-	State::setLabelGroup("object locations", grouperino);
-	//std::vector<std::string> set_state_i = {"L1", "L1", "L2", "L3", "false"};
-	//std::vector<std::string> set_state_f = {"L1", "ee", "L2", "L3", "false"};
-	//std::vector<bool> which_blocking = {false, true, true, true, false};
-	//BlockingState::setBlockingDim(which_blocking);
 	std::vector<bool> which_blocking = {false, true, false};
 	BlockingState::setBlockingDim(which_blocking);
 
@@ -79,6 +36,47 @@ int main(){
 	std::vector<std::string> set_state_i = {"safep", "L1", "false"};
 	init_state.setState(set_state_i);
 	*/
+
+
+
+
+	/* ENVIRONMENT: TWO OBJECTS, TWO DOMAINS (pickup dropoff), TWO LOCATIONS IN PICKUP
+	 * THREE LOCATIONS IN DROP OFF  */
+	std::vector<std::string> var_labels_1 = {"safep", "safed", "L1", "L2", "L3", "L4", "L5"};
+	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2", "L3", "L4", "L5"};
+	std::vector<std::string> var_labels_3 = {"true", "false"};
+	std::vector<std::string> domain_pickup = {"L1", "L2", "safep"};
+	std::vector<std::string> domain_loc_p = {"L1", "L2"};
+	std::vector<std::string> domain_dropoff = {"L3", "L4", "L5", "safed"};
+	std::vector<std::string> domain_loc_d = {"L3", "L4", "L5"};
+	//std::vector<std::string> domain_dropoff = {"L3"};
+	
+	State::setStateDimension(var_labels_1, 0); // eef
+	State::setStateDimension(var_labels_2, 1); // obj1
+	State::setStateDimension(var_labels_2, 2); // obj2
+	//State::setStateDimension(var_labels_2, 2);
+	//State::setStateDimension(var_labels_2, 3);
+	State::setStateDimension(var_labels_3, 3);
+	State::setDomain("pickup domain", domain_pickup);
+	State::setDomain("pickup location domain", domain_loc_p);
+	State::setDomain("dropoff domain", domain_dropoff);
+	State::setDomain("dropoff location domain", domain_loc_d);
+	//State::setDomain("dropoff domain", domain_dropoff);
+	State::setStateDimensionLabel(0, "eeLoc");
+	State::setStateDimensionLabel(1, "obj1Loc");
+	State::setStateDimensionLabel(2, "obj2Loc");
+	//State::setStateDimensionLabel(3, "obj3Loc");
+	State::setStateDimensionLabel(3, "holding");
+	//std::vector<std::string> grouperino = {"obj1Loc", "obj2Loc", "obj3Loc"};
+	std::vector<std::string> grouperino = {"obj1Loc", "obj2Loc"};
+	State::setLabelGroup("object locations", grouperino);
+	std::vector<bool> which_blocking = {false, true, true, false};
+	BlockingState::setBlockingDim(which_blocking);
+
+	BlockingState init_state;
+	init_state.initNewSS();
+	std::vector<std::string> set_state_i = {"safep", "L1", "L2", "false"};
+	init_state.setState(set_state_i);
 
 
 
@@ -231,6 +229,16 @@ int main(){
 	TS.generate();
 	//TS_graph.print();
 	TS.print();
+	
+	std::cout<<"\nYOOOOGA :"<<std::endl;
+	BlockingState teststate;
+	teststate.initNewSS();
+	teststate.toggleDebug(true);
+	teststate.setState("L1", 0);
+	teststate.setState("ee", 1);
+	teststate.setState("L2", 2);
+	teststate.setState("true", 3);
+	teststate.print();
 
 	return 0;
 }
