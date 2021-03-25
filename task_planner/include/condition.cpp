@@ -27,6 +27,8 @@ const int Condition::SIMPLE = 14;
 Condition::Condition() {
 	pr_c.clear();
 	ps_c.clear();
+	action_label = FILLER;
+	label = FILLER;
 }
 
 void Condition::addCondition(int COND_TYPE_, int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_) {

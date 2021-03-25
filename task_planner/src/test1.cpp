@@ -98,9 +98,23 @@ int main(){
 	*/
 	
 	SimpleCondition p1;
+	SimpleCondition p2;
 	p1.addCondition(Condition::SIMPLE, Condition::LABEL, "obj1Loc", Condition::EQUALS, Condition::VAR, "L1");
 	p1.setCondJunctType(Condition::SIMPLE, Condition::CONJUNCTION);
-	std::cout<<" is  me  troo? "<<p1.evaluate(&statei)<<std::endl;
+	p1.setLabel("p1");
+	p2.addCondition(Condition::SIMPLE, Condition::LABEL, "obj2Loc", Condition::EQUALS, Condition::VAR, "L2");
+	p2.setCondJunctType(Condition::SIMPLE, Condition::CONJUNCTION);
+	p2.setLabel("p2");
+	//std::cout<<" is  me  troo? "<<p1.evaluate(&statei)<<std::endl;
+
+	Edge test_TS(true);
+	ProductSystem<State> testPS(&test_TS);
+	testPS.addProposition(&p1);
+	testPS.addProposition(&p2);
+	bool yeeterino = testPS.parseLabelAndEval("!p1 & p2", &statei);
+	std::cout<<" is  me  troo? "<<yeeterino<<std::endl;
+	
+
 
 	
 

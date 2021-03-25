@@ -7,7 +7,7 @@
 int main(){			
 
 	// Set up the environment:
-	/* ENVIRONMENT: SINGLE OBJECT, TWO DOMAINS (pickup dropoff), ONE LOCATION IN EACH
+	/* ENVIRONMENT: SINGLE OBJECT, TWO DOMAINS (pickup dropoff), ONE LOCATION IN EACH */
 	std::vector<std::string> var_labels_1 = {"safep", "safed", "L1", "L2"};
 	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2"};
 	std::vector<std::string> var_labels_3 = {"true", "false"};
@@ -35,13 +35,12 @@ int main(){
 	init_state.initNewSS();
 	std::vector<std::string> set_state_i = {"safep", "L1", "false"};
 	init_state.setState(set_state_i);
-	*/
 
 
 
 
 	/* ENVIRONMENT: TWO OBJECTS, TWO DOMAINS (pickup dropoff), TWO LOCATIONS IN PICKUP
-	 * THREE LOCATIONS IN DROP OFF  */
+	 * THREE LOCATIONS IN DROP OFF  
 	std::vector<std::string> var_labels_1 = {"safep", "safed", "L1", "L2", "L3", "L4", "L5"};
 	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2", "L3", "L4", "L5"};
 	std::vector<std::string> var_labels_3 = {"true", "false"};
@@ -77,7 +76,7 @@ int main(){
 	init_state.initNewSS();
 	std::vector<std::string> set_state_i = {"safep", "L1", "L2", "false"};
 	init_state.setState(set_state_i);
-
+	*/
 
 
 
@@ -216,12 +215,19 @@ int main(){
 	conds[9].setActionLabel("translate");
 	//conds[9].print();
 
-
-	
 	for (int i=0; i<conds.size(); ++i){
 		cond_ptrs[i] = &conds[i];
 	}
 
+
+	/* Propositions */
+	SimpleCondition p1;
+	p1.addCondition(Condition::SIMPLE, Condition::LABEL, "obj1Loc", Condition::EQUALS, Condition::VAR, "L2");
+	//p1.addCondition(Condition::SIMPLE, Condition::LABEL, "eeLoc", Condition::ARG_FIND, Condition::LABEL, "Condition::NEGATE);
+	p1.setCondJunctType(Condition::SIMPLE, Condition::CONJUNCTION);
+	p1.setLabel("p1");
+
+	/*
 	Edge TS_graph(true);
 	TransitionSystem<BlockingState> TS(&TS_graph);
 	TS.setConditions(cond_ptrs);
@@ -229,16 +235,62 @@ int main(){
 	TS.generate();
 	//TS_graph.print();
 	TS.print();
+	*/
 	
-	std::cout<<"\nYOOOOGA :"<<std::endl;
-	BlockingState teststate;
-	teststate.initNewSS();
-	teststate.toggleDebug(true);
-	teststate.setState("L1", 0);
-	teststate.setState("ee", 1);
-	teststate.setState("L2", 2);
-	teststate.setState("true", 3);
-	teststate.print();
+
+
+	/* DFA */
+	Edge TS(true);
+	Edge DFA(true);
+	Edge PS(true);
+	DFA.connect(0, 1, 0.4, "p1");
+	DFA.connect(0, 0, 0.4, "!p1");
+	//DFA.connect(1, 0, 0.4, "!p1");
+	//DFA.connect(1, 1, 0.4, "p1");
+	DFA.print();
+	std::cout<<"made it out of print phew"<<std::endl;
+	
+	ProductSystem<BlockingState> prodsys(&TS, &DFA, &PS);
+	// Transition system stuff:
+	std::cout<<"uno"<<std::endl;
+	prodsys.setConditions(cond_ptrs);
+	prodsys.setInitState(&init_state);
+	std::cout<<"dos"<<std::endl;
+	prodsys.generate();
+	// Product system stuff:
+	prodsys.addProposition(&p1);
+	prodsys.setAutomatonInitStateIndex(0);
+	prodsys.addAutomatonAcceptingStateIndex(1);
+	std::cout<<"tre"<<std::endl;
+	prodsys.compose();
+	std::cout<<"qua"<<std::endl;
+	prodsys.print();
+	std::vector<int> plan;
+	float pathlength;
+	prodsys.plan(plan);
+	std::cout<<"Path: ";
+	for (int i=0; i<plan.size(); ++i) {
+		std::cout<<" -> "<<plan[i];	
+	}
+	std::cout<<"\n";
+	/*
+	Edge TS2(true);
+	TransitionSystem<BlockingState> transys(&TS2);
+	transys.setConditions(cond_ptrs);
+	transys.setInitState(&init_state);
+	transys.generate();
+	std::cout<<"\n --- \n"<<std::endl;
+	transys.print();
+
+	Astar planner;
+	std::cout<<"PS size:"<<PS.returnListCount()<<std::endl;
+	planner.setGraph(&PS);
+	planner.setVInit(0);
+	planner.setVGoal(8);
+	float pathlength;
+	planner.searchDijkstra(path, pathlength);
+	
+	*/
 
 	return 0;
 }

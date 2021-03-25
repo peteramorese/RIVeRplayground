@@ -10,8 +10,14 @@ Edge::Edge(bool ordered_) : ordered(ordered_) {
 	ind_checkout = 0;
 	head = nullptr;
 	prev = nullptr;
+	heads.clear();
+	prevs.clear();
 	checking = false;
 
+}
+
+bool Edge::isOrdered() const {
+	return ordered;
 }
 
 bool Edge::isEmpty() {
@@ -35,11 +41,6 @@ void Edge::append(unsigned int nodeind_, float weight_, std::string label_) {
 		Edge::edgelist* newNode = new Edge::edgelist;
 		//std::cout<<"PTR: "<<newNode<<std::endl;
 		newNode->nodeind = nodeind_;
-		/*
-		   if (weight_!=0){
-		   std::cout<<"Cannot weight first item in list with edge weight. Setting weight to 0\n";
-		   }
-		   */
 		newNode->weight = 0; 
 		newNode->label = "none"; 
 		head = newNode;
@@ -110,14 +111,18 @@ void Edge::newlist(){
 	}
 	head = nullptr;
 	prev = nullptr;
+	append(ind, 0, "none");
 } 
 
 
 int Edge::returnListCount() const {
 	if (ind+1 == heads.size()){
 		return ind+1;
+	} else if (heads.size() == 0) {
+		return 0;	
 	} else {
 		std::cout<<"Error: Number of heads does not match number of lists\n";
+		return 0;
 	}
 }
 
@@ -135,16 +140,21 @@ void Edge::connect(unsigned int ind_from, unsigned int ind_to, float weight_, st
 	while (ind_to > ind){
 		newlist();
 	}
+
 	checkout(ind_from);
+	/*
 	if (isEmpty()){
 		append(ind_from, 0, "none");
 	}
+	*/
 	append(ind_to, weight_, label_);
 	if (!ordered){
 		checkout(ind_to);
+		/*
 		if (isEmpty()){
 			append(ind_to, 0, "none");
 		}
+		*/
 		append(ind_from, weight_, label_);
 	}
 }
@@ -205,7 +215,7 @@ void Edge::print() const {
 
 }
 
-int Edge::augmentedStateFunc(int i, int j, int n, int m) const {
+int Edge::augmentedStateFunc(int i, int j, int n, int m) {
 	int ret_int;
 	ret_int = m*i+j;
 	if (ret_int<=n*m){
@@ -218,14 +228,12 @@ int Edge::augmentedStateFunc(int i, int j, int n, int m) const {
 void Edge::compose(const Edge &mult_graph, Edge& product_graph){
 	int n = heads.size();
 	int m = mult_graph.returnListCount();
-	std::cout<<"n ="<<n<<std::endl;
-	std::cout<<"m ="<<m<<std::endl;
 	auto mult_heads = mult_graph.getHeads();
 	int ind_from, ind_to;
 	for (int i = 0; i<n; i++){
 		for (int j = 0; j<m; j++){
-			auto currptr_i = heads[i];	
-			auto currptr_j = mult_heads[j];	
+			auto currptr_i = heads[i]->adjptr;	
+			auto currptr_j = mult_heads[j]->adjptr;	
 			ind_from = augmentedStateFunc(i, j, n, m);
 			while (currptr_i!=nullptr){
 				int i_to = currptr_i->nodeind;
@@ -253,18 +261,15 @@ void Edge::compose(const Edge &mult_graph, Edge& product_graph){
 }
 
 
-std::pair<unsigned int, unsigned int> Edge::augmentedStateMap(unsigned int ind_product, int n, int m) const {
-	std::pair<unsigned int, unsigned int> ret_pair;
-	int i = 0;
-	int j;
-	int a = 0;
-	while (m*i<ind_product){
+void Edge::augmentedStateMap(unsigned int ind_product, int n, int m, std::pair<unsigned int, unsigned int>& ret_indices) {
+	unsigned int i = 0;
+	unsigned int j;
+	while (m*(i+1)<(ind_product+1)){
 		i++; 
 	}
 	j = ind_product % m; 	
-	ret_pair.first = i;
-	ret_pair.second = j;
-	return ret_pair;
+	ret_indices.first = i;
+	ret_indices.second = j;
 }
 
 Edge::~Edge() {
