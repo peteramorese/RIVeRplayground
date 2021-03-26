@@ -26,7 +26,7 @@ class TransitionSystem {
 	public:
 		TransitionSystem(Edge* graph_TS_);
 		void addCondition(Condition* condition_);
-		void setConditions(std::vector<Condition*> conditions_);
+		void setConditions(const std::vector<Condition*>& conditions_);
 		void setInitState(T* init_state_);
 		T* getState(int node_index);
 		void generate();
@@ -55,9 +55,9 @@ class ProductSystem : public TransitionSystem<T> {
 	public:
 		ProductSystem(Edge* graph_TS_, Edge* graph_DA_, Edge* graph_product_);
 		void addProposition(SimpleCondition* proposition_);
-		void setPropositions(std::vector<SimpleCondition*> propositions_);
+		void setPropositions(const std::vector<SimpleCondition*>& propositions_);
 		void setAutomatonInitStateIndex(int init_state_DA_ind_);
-		void setAutomatonAcceptingStateIndices(std::vector<int> accepting_DA_states_);
+		void setAutomatonAcceptingStateIndices(const std::vector<int>& accepting_DA_states_);
 		void addAutomatonAcceptingStateIndex(int accepting_DA_state_);
 		bool parseLabelAndEval(const std::string& label, const T* state);
 		void compose();

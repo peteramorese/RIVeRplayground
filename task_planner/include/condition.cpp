@@ -131,7 +131,7 @@ void Condition::setPostCondJunctType(int LOGICAL_OPERATOR) {
 }
 */
 
-void Condition::setActionLabel(std::string action_label_) {
+void Condition::setActionLabel(const std::string& action_label_) {
 	action_label = action_label_;
 }
 
@@ -139,7 +139,7 @@ std::string Condition::getActionLabel() {
 	return action_label;
 }
 
-void Condition::setLabel(std::string label_) {
+void Condition::setLabel(const std::string& label_) {
 	label = label_;
 }
 

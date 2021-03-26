@@ -91,7 +91,7 @@ int State::getVarOptionsCount(unsigned int dim) {
 	}
 }
 
-void State::setStateDimensionLabel(unsigned int dim, std::string dimension_label){
+void State::setStateDimensionLabel(unsigned int dim, const std::string& dimension_label){
 	if (dim < state_space_dim) {
 		index_labels[dimension_label] = dim;
 	} else {
@@ -99,7 +99,7 @@ void State::setStateDimensionLabel(unsigned int dim, std::string dimension_label
 	}
 }
 
-void State::setDomain(std::string domain_label, std::vector<std::string> vars){
+void State::setDomain(const std::string& domain_label, const std::vector<std::string>& vars){
 	bool names_found = true;
 	for (int i=0; i<vars.size(); i++){
 		bool names_found_i = false;
@@ -129,7 +129,7 @@ void State::setDomain(std::string domain_label, std::vector<std::string> vars){
 	}
 }
 
-void State::setDomain(std::string domain_label, std::vector<std::string> vars, unsigned int index){
+void State::setDomain(const std::string& domain_label, const std::vector<std::string>& vars, unsigned int index){
 	bool names_found = true;
 	for (int i=0; i<vars.size(); i++){
 		bool names_found_i = false;
@@ -162,7 +162,7 @@ void State::setDomain(std::string domain_label, std::vector<std::string> vars, u
 	}
 }
 
-bool State::getDomains(std::string var, std::vector<std::string>& in_domains) {
+bool State::getDomains(const std::string& var, std::vector<std::string>& in_domains) {
 	in_domains.clear();
 	bool found = false;
 	for (int i=0; i<domains.size(); i++){
@@ -176,7 +176,7 @@ bool State::getDomains(std::string var, std::vector<std::string>& in_domains) {
 	return found;
 }
 
-void State::setLabelGroup(std::string group_label, std::vector<std::string> dimension_labels) {
+void State::setLabelGroup(const std::string& group_label, const std::vector<std::string>& dimension_labels) {
 	domain add_group;
 	add_group.label = group_label;
 	add_group.vars = dimension_labels;
@@ -184,7 +184,7 @@ void State::setLabelGroup(std::string group_label, std::vector<std::string> dime
 
 }
 
-void State::setLabelGroup(std::string group_label, std::vector<std::string> dimension_labels, unsigned int index) {
+void State::setLabelGroup(const std::string& group_label, const std::vector<std::string>& dimension_labels, unsigned int index) {
 	if (index+1 > groups.size()) {
 		groups.resize(index+1);
 	}
@@ -194,7 +194,7 @@ void State::setLabelGroup(std::string group_label, std::vector<std::string> dime
 	groups[index] = add_group;
 }
 
-bool State::argFindGroup(std::string var_find, std::string group_label, std::string& arg_dimension_label) const {
+bool State::argFindGroup(const std::string& var_find, const std::string& group_label, std::string& arg_dimension_label) const {
 	bool is_found = false;
 	arg_dimension_label = "NOT FOUND";
 	for (int i=0; i<groups.size(); i++) {
@@ -241,7 +241,7 @@ void State::setState(const std::vector<std::string>& set_state) {
 	}
 }
 
-void State::setState(std::string set_state_var, unsigned int dim) {
+void State::setState(const std::string& set_state_var, unsigned int dim) {
 	bool name_found = false;
 	if (dim+1 > state_space_dim) {
 		std::cout<<"Error: Dimension out of bounds\n";
@@ -393,7 +393,7 @@ blocking:
 	}
 }
 
-bool BlockingState::setState(std::string set_state_var, unsigned int dim) {
+bool BlockingState::setState(const std::string& set_state_var, unsigned int dim) {
 	bool name_found = false;
 	if (dim+1 > state_space_dim) {
 		std::cout<<"Error: Dimension out of bounds\n";

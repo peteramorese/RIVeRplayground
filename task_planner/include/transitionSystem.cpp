@@ -31,7 +31,7 @@ void TransitionSystem<T>::addCondition(Condition* condition_){
 }
 
 template <class T>
-void TransitionSystem<T>::setConditions(std::vector<Condition*> conditions_) {
+void TransitionSystem<T>::setConditions(const std::vector<Condition*>& conditions_) {
 	conditions = conditions_;
 	has_conditions = true;
 }
@@ -171,7 +171,7 @@ void ProductSystem<T>::addProposition(SimpleCondition* proposition_) {
 }
 
 template <class T>
-void ProductSystem<T>::setPropositions(std::vector<SimpleCondition*> propositions_) {
+void ProductSystem<T>::setPropositions(const std::vector<SimpleCondition*>& propositions_) {
 	for (int i=0; i<propositions_.size(); ++i) {
 		if (propositions_[i]->getLabel() != Condition::FILLER) {
 			propositions[propositions_[i]->getLabel()] = propositions_[i];
@@ -188,7 +188,7 @@ void ProductSystem<T>::setAutomatonInitStateIndex(int init_state_DA_ind_) {
 }
 
 template <class T>
-void ProductSystem<T>::setAutomatonAcceptingStateIndices(std::vector<int> accepting_DA_states_) {
+void ProductSystem<T>::setAutomatonAcceptingStateIndices(const std::vector<int>& accepting_DA_states_) {
 	bool in_bounds = true;
 	for (int i=0; i<accepting_DA_states_.size(); ++i) {
 		if (accepting_DA_states_[i] > graph_DA->returnListCount()-1) {

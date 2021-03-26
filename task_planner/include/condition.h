@@ -58,9 +58,9 @@ class Condition {
 		//void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_);
 		//void addPostCondition(int ARG_1_TYPE_, std::string arg_1_, int OPERATOR_, int ARG_2_TYPE_, std::string arg_2_, bool LOGICAL_, std::string condition_label_);
 		//void setPostCondJunctType(int LOGICAL_OPERATOR);
-		void setActionLabel(std::string action_label_);
+		void setActionLabel(const std::string& action_label_);
 		std::string getActionLabel();
-		void setLabel(std::string label_);
+		void setLabel(const std::string& label_);
 		std::string getLabel();
 		bool subEvaluate(const State* state, const sub_condition& cond);
 		bool evaluate(const State* pre_state, const State* post_state);
