@@ -7,7 +7,7 @@
 int main(){			
 
 	// Set up the environment:
-	/* ENVIRONMENT: SINGLE OBJECT, TWO DOMAINS (pickup dropoff), ONE LOCATION IN EACH */
+	/* ENVIRONMENT: SINGLE OBJECT, TWO DOMAINS (pickup dropoff), ONE LOCATION IN EACH 
 	std::vector<std::string> var_labels_1 = {"safep", "safed", "L1", "L2"};
 	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2"};
 	std::vector<std::string> var_labels_3 = {"true", "false"};
@@ -35,12 +35,12 @@ int main(){
 	init_state.initNewSS();
 	std::vector<std::string> set_state_i = {"safep", "L1", "false"};
 	init_state.setState(set_state_i);
-
+	*/
 
 
 
 	/* ENVIRONMENT: TWO OBJECTS, TWO DOMAINS (pickup dropoff), TWO LOCATIONS IN PICKUP
-	 * THREE LOCATIONS IN DROP OFF  
+	 * THREE LOCATIONS IN DROP OFF  */
 	std::vector<std::string> var_labels_1 = {"safep", "safed", "L1", "L2", "L3", "L4", "L5"};
 	std::vector<std::string> var_labels_2 = {"ee", "L1", "L2", "L3", "L4", "L5"};
 	std::vector<std::string> var_labels_3 = {"true", "false"};
@@ -76,7 +76,6 @@ int main(){
 	init_state.initNewSS();
 	std::vector<std::string> set_state_i = {"safep", "L1", "L2", "false"};
 	init_state.setState(set_state_i);
-	*/
 
 
 

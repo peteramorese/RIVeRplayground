@@ -263,7 +263,7 @@ void State::getState(std::vector<std::string>& ret_state) const {
 	}
 }
 
-std::string State::getVar(std::string dimension_label) const {
+std::string State::getVar(const std::string& dimension_label) const {
 	unsigned int ind = index_labels[dimension_label];
 	int named_ind = state_space[ind];
        	return state_space_named[ind][named_ind];

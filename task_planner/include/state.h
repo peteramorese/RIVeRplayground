@@ -36,7 +36,7 @@ class State {
 		void setState(const std::vector<std::string>& set_state);
 		void setState(std::string set_state_var, unsigned int dim);
 		void getState(std::vector<std::string>& ret_state) const;
-		std::string getVar(std::string dimension_label) const;
+		std::string getVar(const std::string& dimension_label) const;
 		bool isDefined() const;
 		void print() const;
 		bool exclEquals(const State* state_ptr_, const std::vector<std::string>& excl_dimension_labels) const;
